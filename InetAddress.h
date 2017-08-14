@@ -29,6 +29,16 @@ public:
     {
         return sockets::sockaddr_cast(&addr6_);
     }
+
+    void setSockAddrInet6(const sockaddr_in6& addr)
+    {
+        addr6_ = addr;
+    }
+
+    uint16_t portNetEndian()const
+    {
+        return addr_.sin_port;
+    }
 private:
     union
     {

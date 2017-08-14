@@ -6,6 +6,8 @@
 #define WEBSERVER_SOCKET_H
 
 #include <boost/noncopyable.hpp>
+#include "InetAddress.h"
+#include <netinet/tcp.h>
 
 namespace WebServer
 {
@@ -18,11 +20,20 @@ public:
 
     int fd() const { return sockfd_; }
 
+    void bindAddress(const InetAddress& localAddr);
     void listen();
-    void accept();
+    void accept(InetAddress* peerAddr);
+    void shutdownWrite();
+
+    void setTcpNoDelay(bool on);
+    void setReuseAddr(bool on);
+    void setReusePort(bool on);
+    void setKeepAlive(bool on);
+
+    bool getTcpInfo(tcp_info* tcpInfo);
 
 private:
-    int sockfd_;
+    const int sockfd_;
 };
 
 }

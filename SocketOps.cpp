@@ -6,11 +6,43 @@
 #include <iostream>
 #include <boost/implicit_cast.hpp>
 #include <assert.h>
-#include <stdio.h>
 #include <string.h>
+#include <unistd.h>
+#include <fcntl.h>
+#include <netinet/tcp.h>
 
 using namespace WebServer;
 using namespace boost;
+
+const sockaddr* sockets::sockaddr_cast(const sockaddr_in* addr)
+{
+    return static_cast<const sockaddr*>(implicit_cast<const void*>(addr));
+}
+
+const sockaddr* sockets::sockaddr_cast(const sockaddr_in6* addr)
+{
+    return static_cast<const sockaddr*>(implicit_cast<const void*>(addr));
+}
+
+sockaddr* sockets::sockaddr_cast(sockaddr_in* addr)
+{
+    return static_cast<sockaddr*>(implicit_cast<void*>(addr));
+}
+
+sockaddr* sockets::sockaddr_cast(sockaddr_in6* addr)
+{
+    return static_cast<sockaddr*>(implicit_cast<void*>(addr));
+}
+
+const sockaddr_in* sockets::sockaddr_in_cast(const sockaddr* addr)
+{
+    return static_cast<const sockaddr_in*>(implicit_cast<const void*>(addr));
+}
+
+const sockaddr_in6* sockets::sockaddr_in6_cast(const sockaddr* addr)
+{
+    return static_cast<const sockaddr_in6*>(implicit_cast<const void*>(addr));
+}
 
 void sockets::fromIpPort(const char* ip, uint16_t port, sockaddr_in* addr)
 {
@@ -19,6 +51,7 @@ void sockets::fromIpPort(const char* ip, uint16_t port, sockaddr_in* addr)
     if(inet_pton(AF_INET, ip, &addr->sin_addr) <= 0)
     {
         std::cerr<<"sockets::fromIpPort error!"<<std::endl;
+        exit(1);
     }
 }
 
@@ -29,6 +62,7 @@ void sockets::fromIpPort(const char* ip, uint16_t port, sockaddr_in6* addr)
     if(inet_pton(AF_INET6, ip, &addr->sin6_addr) <= 0)
     {
         std::cerr<<"sockets::fromIpPort error!"<<std::endl;
+        exit(1);
     }
 }
 
@@ -69,22 +103,92 @@ void sockets::toIpPort(char* buf, size_t size, const sockaddr* addr)
     snprintf(buf+end, size-end, ":%u", port);
 }
 
-const sockaddr* sockets::sockaddr_cast(const sockaddr_in* addr)
+
+
+void sockets::close(int sockfd)
 {
-    return static_cast<const sockaddr*>(implicit_cast<const void*>(addr));
+    if(::close(sockfd) < 0)
+    {
+        std::cerr << "sockets::close() error!" << std::endl;
+        exit(1);
+    }
 }
 
-const sockaddr* sockets::sockaddr_cast(const sockaddr_in6* addr)
+void sockets::bindOrDie(int sockfd, const sockaddr* addr)
 {
-    return static_cast<const sockaddr*>(implicit_cast<const void*>(addr));
+    int ret = ::bind(sockfd, addr, static_cast<socklen_t>(sizeof sockaddr_in6));
+    if(ret < 0)
+    {
+        std::cerr << "sockets::bindOrDie() error!" << std::endl;
+        exit(1);
+    }
 }
 
-const sockaddr_in* sockets::sockaddr_in_cast(const sockaddr* addr)
+void sockets::listenOrDie(int sockfd)
 {
-    return static_cast<const sockaddr_in*>(implicit_cast<const void*>(addr));
+    int ret = ::listen(sockfd, SOMAXCONN);
+    if(ret < 0)
+    {
+        std::cerr << "sockets::listenOrDie() error!" << std::endl;
+        exit(1);
+    }
 }
 
-const sockaddr_in6* sockets::sockaddr_in6_cast(const sockaddr* addr)
+int sockets::accept(int sockfd, sockaddr_in6* addr)
 {
-    return static_cast<const sockaddr_in6*>(implicit_cast<const void*>(addr));
+    socklen_t addrLen = static_cast<socklen_t>(sizeof(*addr));
+    int connfd = ::accept(sockfd, sockaddr_cast(addr), &addrLen);
+    setNonBlockAndCloseOnExec(connfd);
+
+    return connfd;
+}
+
+void sockets::shutdownWrite(int sockfd)
+{
+    if(::shutdown(sockfd, SHUT_WR) < 0)
+    {
+        std::cerr << "sockets::shutdownWrite() error!" << std::endl;
+        exit(1);
+    }
+}
+
+void sockets::setNonBlockAndCloseOnExec(int sockfd)
+{
+    int flags = ::fcntl(sockfd, F_GETFL, 0);
+    flags |= O_NONBLOCK;
+    ::fcntl(sockfd, F_SETFL, flags);
+
+    flags = ::fcntl(sockfd, F_GETFD, 0);
+    flags |= FD_CLOEXEC;
+    ::fcntl(sockfd, F_SETFD, flags);
+}
+
+void sockets::setTcpNoDelay(int sockfd, bool on)
+{
+    int optVal = on ? 1 : 0;
+    ::setsockopt(sockfd, IPPROTO_TCP, TCP_NODELAY, &optVal, static_cast<socklen_t>(sizeof optVal));
+}
+
+void sockets::setReuseAddr(int sockfd, bool on)
+{
+    int optVal = on ? 1 : 0;
+    ::setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR, &optVal, static_cast<socklen_t>(sizeof optVal));
+}
+
+void sockets::setReusePort(int sockfd, bool on)
+{
+    int optVal = on ? 1 : 0;
+    ::setsockopt(sockfd, SOL_SOCKET, SO_REUSEPORT, &optVal, static_cast<socklen_t>(sizeof optVal));
+}
+
+void sockets::setKeepAlive(int sockfd, bool on)
+{
+    int optVal = on ? 1 : 0;
+    ::setsockopt(sockfd, SOL_SOCKET, SO_KEEPALIVE, &optVal, static_cast<socklen_t>(sizeof optVal));
+}
+
+bool sockets::getTcpInfo(int sockfd, tcp_info* tcpInfo)
+{
+    socklen_t len = static_cast<socklen_t>(tcpInfo);
+    return ::getsockopt(sockfd, SOL_TCP, TCP_INFO, tcpInfo, &len) == 0;
 }

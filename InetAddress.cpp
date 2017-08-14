@@ -79,3 +79,8 @@ std::string InetAddress::toIpPort() const
     sockets::toIpPort(buf, sizeof buf, getSockAddr());
     return buf;
 }
+
+uint16_t InetAddress::toPort() const
+{
+    sockets::networkToHost16(portNetEndian());
+}
