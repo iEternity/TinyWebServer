@@ -4,14 +4,14 @@ project(WebServer)
 set(CMAKE_CXX_STANDARD 11)
 
 set(SOURCE_FILES
-        main.cpp
+        net/main.cpp
         3rd/TinyXML2/tinyxml2.h 3rd/TinyXML2/tinyxml2.cpp
-        Socket.h InetAddress.h InetAddress.cpp Endian.h
-        SocketOps.h SocketOps.cpp Socket.cpp EventLoop.h
-        EventLoop.cpp Channel.cpp Channel.h base/Timestamp.h
-        base/Timestamp.cpp Poller.h Poller.cpp poller/PollPoller.h
-        poller/PollPoller.cpp poller/EpollPoller.h
-        poller/EpollPoller.cpp poller/DefaultPoller.cpp base/Mutex.h base/Thread.h base/Thread.cpp base/Atomic.h base/CurrentThread.h)
+        net/Socket.h net/InetAddress.h net/InetAddress.cpp net/Endian.h
+        net/SocketOps.h net/SocketOps.cpp net/Socket.cpp net/EventLoop.h
+        net/EventLoop.cpp net/Channel.cpp net/Channel.h base/Timestamp.h
+        base/Timestamp.cpp net/Poller.h net/Poller.cpp net/poller/PollPoller.h
+        net/poller/PollPoller.cpp net/poller/EpollPoller.h
+        net/poller/EpollPoller.cpp net/poller/DefaultPoller.cpp base/Mutex.h base/Thread.h base/Thread.cpp base/Atomic.h base/CurrentThread.h)
 
 include_directories(3rd/TinyXML2)
 link_libraries(-lpthread)

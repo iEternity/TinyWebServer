@@ -9,9 +9,9 @@
 #include "Channel.h"
 #include "boost/scoped_ptr.hpp"
 #include "Poller.h"
-#include "base/Timestamp.h"
-#include "base/Mutex.h"
-#include "base/CurrentThread.h"
+#include "../base/Timestamp.h"
+#include "../base/Mutex.h"
+#include "../base/CurrentThread.h"
 
 namespace WebServer
 {
