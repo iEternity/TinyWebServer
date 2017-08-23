@@ -103,20 +103,19 @@ void sockets::toIpPort(char* buf, size_t size, const sockaddr* addr)
     snprintf(buf+end, size-end, ":%u", port);
 }
 
-
-
-void sockets::close(int sockfd)
+int sockets::createNonblockingOrDie(sa_family_t family)
 {
-    if(::close(sockfd) < 0)
-    {
-        std::cerr << "sockets::close() error!" << std::endl;
-        exit(1);
-    }
+    return ::socket(family, SOCK_STREAM, IPPROTO_TCP);
+}
+
+int sockets::connect(int sockfd, const sockaddr* addr)
+{
+    return ::connect(sockfd, addr, static_cast<socklen_t>(sizeof(addr)));
 }
 
 void sockets::bindOrDie(int sockfd, const sockaddr* addr)
 {
-    int ret = ::bind(sockfd, addr, static_cast<socklen_t>(sizeof sockaddr_in6));
+    int ret = ::bind(sockfd, addr, static_cast<socklen_t>(sizeof (sockaddr_in6)));
     if(ret < 0)
     {
         std::cerr << "sockets::bindOrDie() error!" << std::endl;
@@ -141,6 +140,30 @@ int sockets::accept(int sockfd, sockaddr_in6* addr)
     setNonBlockAndCloseOnExec(connfd);
 
     return connfd;
+}
+
+ssize_t sockets::read(int sockfd, void* buf, size_t count)
+{
+    return ::read(sockfd, buf, count);
+}
+
+ssize_t sockets::readv(int sockfd, const iovec* iov, int iovcnt)
+{
+    return ::readv(sockfd, iov, iovcnt);
+}
+
+ssize_t sockets::write(int sockfd, void* buf, size_t count)
+{
+    return ::write(sockfd, buf, count);
+}
+
+void sockets::close(int sockfd)
+{
+    if(::close(sockfd) < 0)
+    {
+        std::cerr << "sockets::close() error!" << std::endl;
+        exit(1);
+    }
 }
 
 void sockets::shutdownWrite(int sockfd)
@@ -189,6 +212,6 @@ void sockets::setKeepAlive(int sockfd, bool on)
 
 bool sockets::getTcpInfo(int sockfd, tcp_info* tcpInfo)
 {
-    socklen_t len = static_cast<socklen_t>(tcpInfo);
+    socklen_t len = static_cast<socklen_t>(sizeof(*tcpInfo));
     return ::getsockopt(sockfd, SOL_TCP, TCP_INFO, tcpInfo, &len) == 0;
 }

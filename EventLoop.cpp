@@ -4,6 +4,7 @@
 #include "EventLoop.h"
 #include <sys/eventfd.h>
 #include "Poller.h"
+#include "SocketOps.h"
 
 using namespace WebServer;
 
@@ -25,7 +26,8 @@ EventLoop::EventLoop()
       quit_(false),
       poller_(Poller::newDefaultPoller(this)),
       wakeupFd_(createEventFd()),
-      wakeupChannel_(new Channel(this, wakeupFd_))
+      wakeupChannel_(new Channel(this, wakeupFd_)),
+      threadId_(CurrentThread::tid())
 
 {
     t_loopInThisThread = this;
@@ -47,7 +49,7 @@ void EventLoop::loop()
     looping_ = true;
     quit_ = false;
 
-    while(!quit)
+    while(!quit_)
     {
         activeChannels_.clear();
         pollReturnTime_ = poller_->poll(kPollTimeMs, &activeChannels_);
@@ -71,7 +73,80 @@ void EventLoop::quit()
 {
     quit_ = true;
 
+    if (!isInLoopThread())
+    {
+        wakeup();
+    }
+
 }
+
+void EventLoop::runInLoop(const Functor& cb)
+{
+    if (isInLoopThread())
+    {
+        cb();
+    }
+    else
+    {
+        queueInLoop(cb);
+    }
+}
+
+void EventLoop::runInLoop(Functor&& cb)
+{
+    if (isInLoopThread())
+    {
+        cb();
+    }
+    else
+    {
+        queueInLoop(std::move(cb));
+    }
+}
+
+void EventLoop::queueInLoop(const Functor& cb)
+{
+    {
+        MutexLock lock(mutex_);
+        pendingFunctors_.push_back(cb);
+    }
+
+    if (!isInLoopThread() || callingPendingFunctors_)
+    {
+        wakeup();
+    }
+}
+
+void EventLoop::queueInLoop(Functor&& cb)
+{
+    {
+        MutexLock lock(mutex_);
+        pendingFunctors_.push_back(std::move(cb));
+    }
+
+    if (!isInLoopThread() || callingPendingFunctors_)
+    {
+        cb();
+    }
+}
+
+void EventLoop::wakeup()
+{
+    uint64_t n = 1;
+    sockets::write(wakeupFd_, &n, sizeof n);
+}
+
+void EventLoop::handleRead()
+{
+    uint64_t n;
+    sockets::read(wakeupFd_, &n, sizeof n);
+}
+
+bool EventLoop::hasChannel()
+{
+
+}
+
 
 void EventLoop::updateChannel(Channel* channel)
 {
@@ -83,12 +158,8 @@ void EventLoop::removeChannel(Channel* channel)
     poller_->removeChannel(channel);
 }
 
-void EventLoop::handleRead()
-{
-
-}
-
 void EventLoop::doPendingFunctors()
 {
 
 }
+

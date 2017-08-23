@@ -35,3 +35,8 @@ void Channel::remove()
     addedToLoop_ = false;
     loop_->removeChannel(this);
 }
+
+void Channel::handleEvent(Timestamp receiveTime)
+{
+
+}

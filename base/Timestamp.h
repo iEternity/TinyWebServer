@@ -55,7 +55,7 @@ public:
         return Timestamp(static_cast<int64_t>(t) * kMicrosecondsPerSecond + microseconds);
     }
 
-    static const kMicrosecondsPerSecond = 1000 * 1000;
+    static const int kMicrosecondsPerSecond = 1000 * 1000;
 private:
     int64_t microsecondsSinceEpoch_;
 };

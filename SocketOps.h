@@ -26,10 +26,15 @@ sockaddr* sockaddr_cast(sockaddr_in6* addr);
 const sockaddr_in* sockaddr_in_cast(const sockaddr* addr);
 const sockaddr_in6* sockaddr_in6_cast(const sockaddr* addr);
 
-void close(int sockfd);
+int createNonblockingOrDie(sa_family_t family);
+int connect(int sockfd, const sockaddr* addr);
 void bindOrDie(int sockfd, const sockaddr* addr);
 void listenOrDie(int sockfd);
 int  accept(int sockfd, sockaddr_in6* addr);
+ssize_t read(int sockfd, void* buf, size_t count);
+ssize_t readv(int sockfd, const iovec* iov, int iovcnt);
+ssize_t write(int sockfd, void* buf, size_t count);
+void close(int sockfd);
 void shutdownWrite(int sockfd);
 
 void setNonBlockAndCloseOnExec(int sockfd);

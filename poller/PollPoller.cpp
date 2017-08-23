@@ -39,8 +39,8 @@ void PollPoller::fillActiveChannels(int numEvents, ChannelList* activeChannels) 
         if(it->revents > 0)
         {
             numEvents --;
-
-            Channel* channel = channels_[it->fd];
+            ChannelMap::const_iterator ch = channels_.find(it->fd);
+            Channel* channel = ch->second;
             channel->setRevents(it->revents);
             activeChannels->push_back(channel);
         }

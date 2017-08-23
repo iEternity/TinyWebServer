@@ -9,10 +9,13 @@
 #include <map>
 #include "Channel.h"
 #include "EventLoop.h"
-#include "/base/Timestamp.h"
+#include "base/Timestamp.h"
 
 namespace WebServer
 {
+
+class Channel;
+class EventLoop;
 
 class Poller : boost::noncopyable
 {

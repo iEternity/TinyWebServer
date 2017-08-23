@@ -11,8 +11,8 @@ set(SOURCE_FILES
         EventLoop.cpp Channel.cpp Channel.h base/Timestamp.h
         base/Timestamp.cpp Poller.h Poller.cpp poller/PollPoller.h
         poller/PollPoller.cpp poller/EpollPoller.h
-        poller/EpollPoller.cpp poller/DefaultPoller.cpp)
+        poller/EpollPoller.cpp poller/DefaultPoller.cpp base/Mutex.h base/Thread.h base/Thread.cpp base/Atomic.h base/CurrentThread.h)
 
 include_directories(3rd/TinyXML2)
-
+link_libraries(-lpthread)
 add_executable(WebServer ${SOURCE_FILES})
