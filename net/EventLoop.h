@@ -12,6 +12,7 @@
 #include "../base/Timestamp.h"
 #include "../base/Mutex.h"
 #include "../base/CurrentThread.h"
+#include "Timer.h"
 
 namespace WebServer
 {
