@@ -13,6 +13,8 @@
 
 namespace WebServer
 {
+class EventLoop;
+class TimerId;
 
 class TimerQueue : boost::noncopyable
 {

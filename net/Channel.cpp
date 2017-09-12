@@ -24,6 +24,17 @@ Channel::~Channel()
 
 }
 
+void Channel::handleEvent(Timestamp receiveTime)
+{
+
+}
+
+
+void Channel::tie(const std::shared_ptr<void>& obj)
+{
+
+}
+
 void Channel::update()
 {
     addedToLoop_ = true;
@@ -36,7 +47,4 @@ void Channel::remove()
     loop_->removeChannel(this);
 }
 
-void Channel::handleEvent(Timestamp receiveTime)
-{
 
-}

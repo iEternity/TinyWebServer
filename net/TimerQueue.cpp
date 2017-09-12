@@ -79,14 +79,14 @@ TimerId TimerQueue::addTimer(const TimerCallback& cb, Timestamp when, double int
 {
     TimerPtr timer = std::make_shared<Timer>(cb, when, interval);
     loop_->runInLoop(std::bind(&TimerQueue::addTimerInLoop, this, timer));
-    return TimerId(timer.get(), timer->sequence());
+    return TimerId(timer, timer->sequence());
 }
 
 TimerId TimerQueue::addTimer(TimerCallback&& cb, Timestamp when, double interval)
 {
     TimerPtr timer = std::make_shared<Timer>(std::move(cb), when, interval);
     loop_->runInLoop(std::bind(&TimerQueue::addTimerInLoop, this, timer));
-    return TimerId(timer.get(), timer->sequence());
+    return TimerId(timer, timer->sequence());
 }
 
 void TimerQueue::cancel(TimerId timerId)
@@ -112,7 +112,6 @@ void TimerQueue::cancelInLoop(TimerId timerId)
     if(it != activeTimers_.end())
     {
         timers_.erase(Entry(it->first->expiration(), it->first));
-        it->first.reset();
         activeTimers_.erase(timer);
     }
     else if(callingExpiredTimers_)
@@ -140,7 +139,7 @@ void TimerQueue::handleRead()
 
 }
 
-std::vector<Entry> TimerQueue::getExpired(Timestamp now)
+std::vector<TimerQueue::Entry> TimerQueue::getExpired(Timestamp now)
 {
     std::vector<Entry> expired;
     //Entry sentry(now, reinterpret_cast<Timer*>(UINTPTR_MAX));

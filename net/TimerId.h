@@ -13,13 +13,15 @@ class Timer;
 class TimerId
 {
 public:
+    using TimerPtr = std::shared_ptr<Timer>;
+
     TimerId()
-        : timer_(NULL),
+        : timer_(nullptr),
           sequence_(0)
     {
     }
 
-    TimerId(Timer* timer, int64_t seq)
+    TimerId(TimerPtr timer, int64_t seq)
         : timer_(timer),
           sequence_(seq)
     {
@@ -27,7 +29,7 @@ public:
 
     friend class TimerQueue;
 private:
-    Timer* timer_;
+    TimerPtr timer_;
     int64_t sequence_;
 };
 
