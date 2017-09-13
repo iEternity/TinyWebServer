@@ -6,6 +6,7 @@
 #define WEBSERVER_MUTEX_H
 #include <boost/noncopyable.hpp>
 #include <pthread.h>
+#include "CurrentThread.h"
 
 namespace WebServer
 {
@@ -14,13 +15,20 @@ class MutexLock
 {
 public:
     MutexLock()
+        : holder_(0)
     {
         pthread_mutex_init(&mutex_, NULL);
     }
 
     ~MutexLock()
     {
+        assert(holder_ == 0);
         pthread_mutex_destroy(&mutex_);
+    }
+
+    bool isLockedByThisThread() const
+    {
+        return holder_ == CurrentThread::tid();
     }
 
     void lock()
@@ -33,8 +41,43 @@ public:
         pthread_mutex_unlock(&mutex_);
     }
 
+    pthread_mutex_t* getPthreadMutex()
+    {
+        return &mutex_;
+    }
+
 private:
+    friend class Condition;
+
+    class UnassignGuard : boost::noncopyable
+    {
+    public:
+        UnassignGuard(MutexLock& owner):
+                owner_(owner)
+        {
+            owner_.unassignHolder();
+        }
+
+        ~UnassignGuard()
+        {
+            owner_.assignHolder();
+        }
+    private:
+        MutexLock& owner_;
+    };
+
+    void assignHolder()
+    {
+        holder_ = CurrentThread::tid();
+    }
+
+    void unassignHolder()
+    {
+        holder_ = 0;
+    }
+
     pthread_mutex_t mutex_;
+    pid_t holder_;
 };
 
 class MutexLockGuard : boost::noncopyable
@@ -57,4 +100,5 @@ private:
 
 }
 
+#define MutexLockGuard(x) error "Missing guard object name"
 #endif //WEBSERVER_MUTEX_H
