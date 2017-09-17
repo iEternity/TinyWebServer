@@ -22,7 +22,7 @@ void Socket::listen()
     sockets::listenOrDie(sockfd_);
 }
 
-void Socket::accept(InetAddress* peerAddr)
+int Socket::accept(InetAddress* peerAddr)
 {
     sockaddr_in6 addr;
     memset(&addr, 0, sizeof addr);
@@ -37,7 +37,7 @@ void Socket::accept(InetAddress* peerAddr)
         std::cerr << "Socket::accept() error!" << std::endl;
         exit(1);
     }
-
+    return connfd;
 }
 
 void Socket::shutdownWrite()
