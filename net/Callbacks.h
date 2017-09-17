@@ -6,14 +6,29 @@
 #define WEBSERVER_CALLBACKS_H
 
 #include <functional>
+#include <memory>
 
 namespace WebServer
 {
 
 class Buffer;
 class TcpConnection;
+class Timestamp;
+
+using TcpConnectionPtr = std::shared_ptr<TcpConnection>;
 
 using TimerCallback = std::function<void()>;
+
+using ConnectionCallback = std::function<void(const TcpConnectionPtr&)>;
+using CloseCallback = std::function<void(const TcpConnectionPtr&)>;
+using WriteCompleteCallback = std::function<void(const TcpConnectionPtr&)>;
+using HighWaterMarkCallback = std::function<void(const TcpConnectionPtr&, size_t)>;
+using MessageCallback = std::function<void(const TcpConnectionPtr&,
+                                           Buffer*,
+                                           Timestamp)>;
+
+void defaultConnectionCallback(const TcpConnectionPtr& conn);
+void defaultMessageCallback(const TcpConnectionPtr& conn, Buffer* buffer, Timestamp receiveTime);
 
 }
 
