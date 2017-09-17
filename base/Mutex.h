@@ -7,6 +7,7 @@
 #include <boost/noncopyable.hpp>
 #include <pthread.h>
 #include "CurrentThread.h"
+#include <assert.h>
 
 namespace WebServer
 {
