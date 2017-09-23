@@ -70,3 +70,29 @@ bool Socket::getTcpInfo(tcp_info* tcpInfo)
     return sockets::getTcpInfo(sockfd_,tcpInfo);
 }
 
+bool Socket::getTcpInfoString(char* buf, size_t len)
+{
+    struct tcp_info tcpi;
+    bool ok = getTcpInfo(&tcpi);
+    if(ok)
+    {
+        snprintf(buf, len, "unrecovered = %u "
+                 "rto = %u ato = %u snd_mss = %u rcv_mss = %u "
+                 "lost = %u retrans = %u rtt = %u rttvar = %u "
+                 "sshthresh = %u cwnd = %u total_retrans = %u",
+                  tcpi.tcpi_retransmits,    //超时重传的次数
+                  tcpi.tcpi_rto,            //超时时间（微秒）
+                  tcpi.tcpi_ato,            //延时确认的估值
+                  tcpi.tcpi_snd_mss,        //本端每个分节的最大字节数
+                  tcpi.tcpi_rcv_mss,        //对端每个分节的最大字节数
+                  tcpi.tcpi_lost,           //丢失未恢复的数据段数
+                  tcpi.tcpi_retrans,        //重传且未确认的数据段数
+                  tcpi.tcpi_rtt,            //平滑的rtt
+                  tcpi.tcpi_rttvar,         //
+                  tcpi.tcpi_snd_ssthresh,   //慢启动阈值
+                  tcpi.tcpi_snd_cwnd,       //拥塞窗口
+                  tcpi.tcpi_total_retrans); //本连接的总重传个数
+    }
+
+    return ok;
+}

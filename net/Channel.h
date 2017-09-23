@@ -51,11 +51,11 @@ public:
 
     void enableReading() { events_ |= kReadEvent; update(); }
     void disableReading() { events_ &= ~kReadEvent; update(); }
-    void enableWriteing() { events_ |= kWriteEvent; update(); }
+    void enableWriting() { events_ |= kWriteEvent; update(); }
     void disableWriting() { events_ &= ~kWriteEvent; update(); }
     void disableAll() { events_ = kNoneEvent; update(); }
     bool isReading() const { return events_ & kReadEvent; }
-    bool isWriteing() const { return events_ & kWriteEvent; }
+    bool isWriting() const { return events_ & kWriteEvent; }
 
     void remove();
 
@@ -78,6 +78,9 @@ private:
     EventCallback writeCallback_;
     EventCallback closeCallback_;
     EventCallback errorCallback_;
+
+    std::weak_ptr<void> tie_;
+    bool tied_;
 };
 
 }

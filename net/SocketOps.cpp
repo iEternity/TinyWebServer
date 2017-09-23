@@ -13,6 +13,7 @@
 
 using namespace WebServer;
 using namespace boost;
+using namespace sockets;
 
 const sockaddr* sockets::sockaddr_cast(const sockaddr_in* addr)
 {
@@ -152,7 +153,7 @@ ssize_t sockets::readv(int sockfd, const struct iovec* iov, int iovcnt)
     return ::readv(sockfd, iov, iovcnt);
 }
 
-ssize_t sockets::write(int sockfd, void* buf, size_t count)
+ssize_t sockets::write(int sockfd, const void* buf, size_t count)
 {
     return ::write(sockfd, buf, count);
 }
@@ -214,4 +215,43 @@ bool sockets::getTcpInfo(int sockfd, tcp_info* tcpInfo)
 {
     socklen_t len = static_cast<socklen_t>(sizeof(*tcpInfo));
     return ::getsockopt(sockfd, SOL_TCP, TCP_INFO, tcpInfo, &len) == 0;
+}
+
+int sockets::getSocketError(int sockfd)
+{
+    int optval = 0;
+    socklen_t optlen = static_cast<socklen_t>(sizeof optval);
+
+    if(::getsockopt(sockfd, SOL_SOCKET, SO_ERROR, &optval, &optlen) < 0)
+    {
+        return errno;
+    }
+    else
+    {
+        return optlen;
+    }
+}
+
+struct sockaddr_in6 sockets::getLocalAddr(int sockfd)
+{
+    struct sockaddr_in6 localAddr;
+    bzero(&localAddr, sizeof(localAddr));
+    socklen_t addrlen = static_cast<socklen_t>(sizeof(localAddr));
+    if(::getsockname(sockfd, sockaddr_cast(&localAddr), &addrlen) < 0)
+    {
+        //LOG_SYSERR << "getLocalAddr()";
+    }
+    return localAddr;
+}
+
+struct sockaddr_in6 sockets::getPeerAddr(int sockfd)
+{
+    struct sockaddr_in6 peerAddr;
+    bzero(&peerAddr, sizeof(peerAddr));
+    socklen_t addrlen = static_cast<socklen_t>(sizeof(peerAddr));
+    if(::getpeername(sockfd, sockaddr_cast(&peerAddr), &addrlen) < 0)
+    {
+        //LOG_SYSERR << "sockets::getPeerAddr()";
+    }
+    return peerAddr;
 }

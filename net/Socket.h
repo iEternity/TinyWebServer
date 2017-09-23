@@ -32,6 +32,7 @@ public:
     void setKeepAlive(bool on);
 
     bool getTcpInfo(tcp_info* tcpInfo);
+    bool getTcpInfoString(char* buf, size_t len);
 
 private:
     const int sockfd_;

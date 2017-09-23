@@ -10,7 +10,7 @@
 #include "Callbacks.h"
 #include <boost/scoped_ptr.hpp>
 #include <map>
-#include "../base/Atomic.h"
+#include <atomic>
 
 namespace WebServer
 {
@@ -35,36 +35,38 @@ public:
               Option option = kNoReusePort);
     ~TcpServer();
 
-    const std::string& ipPort() const { return ipPort_; }
-    const std::string& name() const { return name_; }
-    EventLoop* getLoop() const {return loop_; }
+    EventLoop*                              getLoop() const { return loop_; }
+    const std::string&                      ipPort() const  { return ipPort_; }
+    const std::string&                      name() const    { return name_; }
+    std::shared_ptr<EventLoopThreadPool>    getThreadPool() { return threadPool_; }
 
     void setThreadNum(int numThreads);
-    void setThreadInitCallback(const ThreadInitCallback& cb)
-    { threadInitCallback_ = cb; }
-    void setThreadInitCallback(ThreadInitCallback&& cb)
-    { threadInitCallback_ = std::move(cb); }
+    void setThreadInitCallback(const ThreadInitCallback& cb)    { threadInitCallback_ = cb; }
+    void setThreadInitCallback(ThreadInitCallback&& cb)         { threadInitCallback_ = std::move(cb); }
 
-    std::shared_ptr<EventLoopThreadPool> getThreadPool()
-    {
-        return threadPool_;
-    }
+    void start();
 
 private:
     using ConnectionMap = std::map<std::string, TcpConnectionPtr >;
-    EventLoop* loop_;
-    const std::string ipPort_;
-    const std::string name_;
-    boost::scoped_ptr<Acceptor> acceptor_;
-    std::shared_ptr<EventLoopThreadPool> threadPool_;
-    ConnectionCallback connectionCallback_;
-    MessageCallback messageCallback_;
-    WriteCompleteCallback writeCompleteCallback_;
-    ThreadInitCallback threadInitCallback_;
 
-    AtomicInt32 started_;
-    int nextConnId_;
-    ConnectionMap connections_;
+    void newConnection(int sockfd, const InetAddress& peerAddr);
+    void removeConnection(const TcpConnectionPtr& conn);
+    void removeConnectionInLoop(const TcpConnectionPtr& conn);
+
+    EventLoop*                              loop_;
+    const std::string                       ipPort_;
+    const std::string                       name_;
+    std::unique_ptr<Acceptor>               acceptor_;
+    std::shared_ptr<EventLoopThreadPool>    threadPool_;
+    std::atomic<bool>                       started_;
+    int                                     nextConnId_;
+
+    ConnectionCallback      connectionCallback_;
+    MessageCallback         messageCallback_;
+    WriteCompleteCallback   writeCompleteCallback_;
+    ThreadInitCallback      threadInitCallback_;
+
+    ConnectionMap       connections_;
 };
 
 }

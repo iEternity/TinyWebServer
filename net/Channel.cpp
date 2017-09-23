@@ -14,7 +14,8 @@ Channel::Channel(EventLoop* loop, int fd)
       fd_(fd),
       events_(0),
       revents_(0),
-      index_(-1)
+      index_(-1),
+      tied_(false)
 {
 
 }
@@ -32,7 +33,8 @@ void Channel::handleEvent(Timestamp receiveTime)
 
 void Channel::tie(const std::shared_ptr<void>& obj)
 {
-
+    tie_ = obj;
+    tied_ = true;
 }
 
 void Channel::update()
