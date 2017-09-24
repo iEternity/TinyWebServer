@@ -18,7 +18,7 @@ set(SOURCE_FILES
         net/EventLoopThread.h net/EventLoopThread.cpp base/Condition.h
         net/TcpServer.cpp net/EventLoopThreadPool.h
         net/EventLoopThreadPool.cpp net/Acceptor.h net/Acceptor.cpp
-        net/Buffer.h net/Buffer.cpp net/StringPiece.h net/TcpConnection.h net/TcpConnection.cpp base/WeakCallback.h)
+        net/Buffer.h net/Buffer.cpp net/StringPiece.h net/TcpConnection.h net/TcpConnection.cpp base/WeakCallback.h net/Connector.h net/Connector.cpp)
 
 include_directories(3rd/TinyXML2)
 link_libraries(-lpthread)

@@ -255,3 +255,26 @@ struct sockaddr_in6 sockets::getPeerAddr(int sockfd)
     }
     return peerAddr;
 }
+
+bool sockets::isSelfConnect(int sockfd)
+{
+    auto localAddr = getLocalAddr(sockfd);
+    auto peerAddr  = getPeerAddr(sockfd);
+
+    if(localAddr.sin6_family == AF_INET)
+    {
+        auto laddr4 = reinterpret_cast<struct sockaddr_in*>(&localAddr);
+        auto raddr4 = reinterpret_cast<struct sockaddr_in*>(&peerAddr);
+        return laddr4->sin_port == raddr4->sin_port &&
+               laddr4->sin_addr.s_addr == raddr4->sin_addr.s_addr;
+    }
+    else if(localAddr.sin6_family == AF_INET6)
+    {
+        return localAddr.sin6_port == peerAddr.sin6_port &&
+               memcmp(&localAddr.sin6_addr, &peerAddr.sin6_addr, sizeof(localAddr)) == 0;
+    }
+    else
+    {
+        return false;
+    }
+}

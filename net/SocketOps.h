@@ -46,6 +46,7 @@ bool                getTcpInfo(int sockfd, tcp_info* tcpInfo);
 int                 getSocketError(int sockfd);
 struct sockaddr_in6 getLocalAddr(int sockfd);
 struct sockaddr_in6 getPeerAddr(int sockfd);
+bool                isSelfConnect(int sockfd);
 
 }
 }
