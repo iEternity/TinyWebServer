@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.7)
-project(WebServer)
+project(xNet)
 
 set(CMAKE_CXX_STANDARD 11)
 
@@ -18,8 +18,8 @@ set(SOURCE_FILES
         net/EventLoopThread.h net/EventLoopThread.cpp base/Condition.h
         net/TcpServer.cpp net/EventLoopThreadPool.h
         net/EventLoopThreadPool.cpp net/Acceptor.h net/Acceptor.cpp
-        net/Buffer.h net/Buffer.cpp net/StringPiece.h net/TcpConnection.h net/TcpConnection.cpp base/WeakCallback.h net/Connector.h net/Connector.cpp net/TcpClient.h net/TcpClient.cpp)
+        net/Buffer.h net/Buffer.cpp net/StringPiece.h net/TcpConnection.h net/TcpConnection.cpp base/WeakCallback.h net/Connector.h net/Connector.cpp net/TcpClient.h net/TcpClient.cpp base/Logging.h base/Logging.cpp base/LogStream.h base/LogStream.cpp)
 
 include_directories(3rd/TinyXML2)
 link_libraries(-lpthread)
-add_executable(WebServer ${SOURCE_FILES})
+add_executable(xNet ${SOURCE_FILES})
