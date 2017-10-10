@@ -8,7 +8,7 @@
 #include "../Poller.h"
 #include "poll.h"
 
-namespace WebServer
+namespace xnet
 {
 
 class PollPoller : public Poller

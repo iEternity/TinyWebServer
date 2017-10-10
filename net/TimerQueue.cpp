@@ -5,7 +5,7 @@
 #include "TimerQueue.h"
 #include "sys/timerfd.h"
 
-namespace WebServer
+namespace xnet
 {
 
 namespace detail
@@ -49,8 +49,8 @@ void resetTimerfd(int timerfd, Timestamp expiration)
 
 }
 
-using namespace WebServer;
-using namespace WebServer::detail;
+using namespace xnet;
+using namespace xnet::detail;
 
 TimerQueue::TimerQueue(EventLoop *loop)
     : loop_(loop),

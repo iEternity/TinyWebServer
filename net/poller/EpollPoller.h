@@ -8,7 +8,7 @@
 #include <sys/epoll.h>
 #include <vector>
 
-namespace WebServer
+namespace xnet
 {
 
 class EpollPoller : public Poller

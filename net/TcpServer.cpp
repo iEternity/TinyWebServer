@@ -8,7 +8,7 @@
 #include "EventLoopThreadPool.h"
 #include "TcpConnection.h"
 
-using namespace WebServer;
+using namespace xnet;
 using namespace std::placeholders;
 
 TcpServer::TcpServer(EventLoop* loop,

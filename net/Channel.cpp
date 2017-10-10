@@ -3,7 +3,7 @@
 //
 #include "Channel.h"
 #include <poll.h>
-using namespace WebServer;
+using namespace xnet;
 
 const int Channel::kNoneEvent = 0;
 const int Channel::kReadEvent = POLLIN | POLLPRI;

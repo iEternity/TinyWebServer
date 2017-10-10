@@ -7,7 +7,7 @@
 #include "SocketOps.h"
 #include "TimerQueue.h"
 
-using namespace WebServer;
+using namespace xnet;
 
 namespace
 {

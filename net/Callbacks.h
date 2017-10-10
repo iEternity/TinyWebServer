@@ -8,7 +8,7 @@
 #include <functional>
 #include <memory>
 
-namespace WebServer
+namespace xnet
 {
 
 class Buffer;

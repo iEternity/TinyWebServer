@@ -11,7 +11,7 @@
 #include <memory>
 #include "../base/Timestamp.h"
 
-namespace WebServer
+namespace xnet
 {
 
 class EventLoop;

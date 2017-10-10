@@ -12,7 +12,7 @@
 #include <map>
 #include <atomic>
 
-namespace WebServer
+namespace xnet
 {
 
 class EventLoop;

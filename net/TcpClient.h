@@ -9,7 +9,7 @@
 #include "../base/Mutex.h"
 #include "../base/WeakCallback.h"
 
-namespace WebServer
+namespace xnet
 {
 
 class EventLoop;

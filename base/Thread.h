@@ -12,7 +12,7 @@
 #include <memory>
 #include "Atomic.h"
 
-namespace WebServer
+namespace xnet
 {
 
 class Thread : boost::noncopyable

@@ -8,7 +8,7 @@
 #include <boost/operators.hpp>
 #include <string>
 
-namespace WebServer
+namespace xnet
 {
 class Timestamp : boost::less_than_comparable<Timestamp>
 {

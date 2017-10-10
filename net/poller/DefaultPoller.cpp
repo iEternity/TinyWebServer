@@ -4,7 +4,7 @@
 #include "../Poller.h"
 #include "PollPoller.h"
 #include "EpollPoller.h"
-using namespace WebServer;
+using namespace xnet;
 
 Poller* Poller::newDefaultPoller(EventLoop *loop)
 {

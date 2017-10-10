@@ -11,7 +11,7 @@
 #include "Callbacks.h"
 #include "Channel.h"
 
-namespace WebServer
+namespace xnet
 {
 class EventLoop;
 class TimerId;

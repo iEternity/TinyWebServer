@@ -11,7 +11,7 @@
 #include <fcntl.h>
 #include <netinet/tcp.h>
 
-using namespace WebServer;
+using namespace xnet;
 using namespace boost;
 using namespace sockets;
 

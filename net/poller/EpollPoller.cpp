@@ -4,7 +4,7 @@
 #include "EpollPoller.h"
 #include <string.h>
 #include <boost/implicit_cast.hpp>
-using namespace WebServer;
+using namespace xnet;
 using namespace boost;
 
 namespace

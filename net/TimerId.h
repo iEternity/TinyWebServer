@@ -6,7 +6,7 @@
 #define WEBSERVER_TIMERID_H
 #include "Timer.h"
 
-namespace WebServer
+namespace xnet
 {
 
 class Timer;

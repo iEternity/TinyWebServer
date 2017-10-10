@@ -5,7 +5,7 @@
 #ifndef WEBSERVER_CURRENTTHREAD_H
 #define WEBSERVER_CURRENTTHREAD_H
 
-namespace WebServer
+namespace xnet
 {
 
 namespace CurrentThread
@@ -46,6 +46,6 @@ namespace CurrentThread
     void sleepUsec(int64_t usec);
 }   //namespace CurrentThread
 
-}   //namespace WebServer
+}   //namespace xNet
 
 #endif //WEBSERVER_CURRENTTHREAD_H

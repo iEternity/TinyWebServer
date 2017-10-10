@@ -2,7 +2,7 @@
 // Created by zhangkuo on 17-8-23.
 //
 #include "Timer.h"
-using namespace WebServer;
+using namespace xnet;
 
 AtomicInt64 Timer::s_numCreated_;
 

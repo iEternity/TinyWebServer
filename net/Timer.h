@@ -9,7 +9,7 @@
 #include "Callbacks.h"
 #include "../base/Atomic.h"
 
-namespace WebServer
+namespace xnet
 {
 
 class Timer : boost::noncopyable

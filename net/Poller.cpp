@@ -3,7 +3,7 @@
 //
 
 #include "Poller.h"
-using namespace WebServer;
+using namespace xnet;
 
 Poller::Poller(EventLoop* loop)
     : ownerLoop_(loop)

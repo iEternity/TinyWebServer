@@ -4,7 +4,7 @@
 #include "EventLoopThread.h"
 #include "EventLoop.h"
 
-using namespace WebServer;
+using namespace xnet;
 
 EventLoopThread::EventLoopThread(const ThreadInitCallback& cb,
                                  const std::string& name):

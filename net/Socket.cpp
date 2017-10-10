@@ -5,7 +5,7 @@
 #include "SocketOps.h"
 #include <string.h>
 #include <iostream>
-using namespace WebServer;
+using namespace xnet;
 
 Socket::~Socket()
 {

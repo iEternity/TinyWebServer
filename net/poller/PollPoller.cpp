@@ -2,7 +2,7 @@
 // Created by zhangkuo on 17-8-9.
 //
 #include "PollPoller.h"
-using namespace WebServer;
+using namespace xnet;
 
 PollPoller::PollPoller(EventLoop* loop)
         : Poller(loop)

@@ -8,7 +8,7 @@
 #include <memory>
 #include "InetAddress.h"
 
-namespace WebServer
+namespace xnet
 {
 class EventLoop;
 class Channel;

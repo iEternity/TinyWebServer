@@ -5,7 +5,7 @@
 #include <sys/time.h>
 #include "Timestamp.h"
 
-using namespace WebServer;
+using namespace xnet;
 
 std::string Timestamp::toString() const
 {

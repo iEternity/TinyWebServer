@@ -10,7 +10,7 @@
 #include <functional>
 #include <boost/ptr_container/ptr_vector.hpp>
 
-namespace WebServer
+namespace xnet
 {
 
 class EventLoop;

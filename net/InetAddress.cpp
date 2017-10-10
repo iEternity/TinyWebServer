@@ -6,7 +6,7 @@
 #include <string.h>
 #include "Endian.h"
 #include "SocketOps.h"
-using namespace WebServer;
+using namespace xnet;
 
 static const in_addr_t kInaddrAny = INADDR_ANY;
 static const in_addr_t kInaddrLoopback = INADDR_LOOPBACK;

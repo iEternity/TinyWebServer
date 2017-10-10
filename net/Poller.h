@@ -11,7 +11,7 @@
 #include "EventLoop.h"
 #include "../base/Timestamp.h"
 
-namespace WebServer
+namespace xnet
 {
 
 class Channel;

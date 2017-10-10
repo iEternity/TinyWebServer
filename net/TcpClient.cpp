@@ -5,11 +5,11 @@
 #include "EventLoop.h"
 #include "Connector.h"
 
-using namespace WebServer;
+using namespace xnet;
 using namespace std;
 using namespace std::placeholders;
 
-namespace WebServer
+namespace xnet
 {
 namespace detail
 {

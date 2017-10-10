@@ -15,7 +15,7 @@
 #include "Timer.h"
 #include "TimerId.h"
 
-namespace WebServer
+namespace xnet
 {
 class Channel;
 class Poller;

@@ -7,7 +7,7 @@
 #include "InetAddress.h"
 #include "SocketOps.h"
 
-using namespace WebServer;
+using namespace xnet;
 
 Acceptor::Acceptor(EventLoop* loop, const InetAddress& listenAddr, bool reusePort):
     loop_(loop),

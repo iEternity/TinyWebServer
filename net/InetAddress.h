@@ -9,7 +9,7 @@
 #include <string>
 #include "SocketOps.h"
 
-namespace WebServer
+namespace xnet
 {
 
 class InetAddress

@@ -8,7 +8,7 @@
 #include <memory>
 #include <functional>
 
-namespace WebServer
+namespace xnet
 {
 
 template<typename CLASS, typename... ARGS>

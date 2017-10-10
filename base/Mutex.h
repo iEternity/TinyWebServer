@@ -9,7 +9,7 @@
 #include "CurrentThread.h"
 #include <assert.h>
 
-namespace WebServer
+namespace xnet
 {
 
 class MutexLock

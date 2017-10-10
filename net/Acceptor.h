@@ -9,7 +9,7 @@
 #include "Socket.h"
 #include "Channel.h"
 
-namespace WebServer
+namespace xnet
 {
 class EventLoop;
 class InetAddress;

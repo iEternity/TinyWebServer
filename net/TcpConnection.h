@@ -13,7 +13,7 @@
 #include "Buffer.h"
 #include "Callbacks.h"
 
-namespace WebServer
+namespace xnet
 {
 
 class EventLoop;

@@ -8,7 +8,7 @@
 #include <endian.h>
 #include <stdint.h>
 
-namespace WebServer
+namespace xnet
 {
 
 namespace sockets
@@ -39,6 +39,6 @@ namespace sockets
     }
 
 }   //sockets
-}   //WebServer
+}   //xNet
 
 #endif //WEBSERVER_ENDIAN_H

@@ -13,7 +13,7 @@
 #include "StringPiece.h"
 #include "Endian.h"
 
-namespace WebServer
+namespace xnet
 {
 
 class Buffer

@@ -7,7 +7,7 @@
 #include <sys/syscall.h>
 #include <sys/prctl.h>
 
-namespace WebServer
+namespace xnet
 {
 
 namespace CurrentThread
@@ -74,7 +74,7 @@ struct ThreadData
             pTid.reset();
         }
 
-        WebServer::CurrentThread::t_threadName = name_.empty() ? "webServerThread" : name_.c_str();
+        xnet::CurrentThread::t_threadName = name_.empty() ? "webServerThread" : name_.c_str();
         ::prctl(PR_SET_NAME, CurrentThread::t_threadName);
 
         func_();
@@ -92,9 +92,9 @@ void* startThread(void* obj)
 }
 
 }   //namespace detail
-}   //namespace WebServer
+}   //namespace xNet
 
-using namespace WebServer;
+using namespace xnet;
 
 void CurrentThread::cacheTid()
 {

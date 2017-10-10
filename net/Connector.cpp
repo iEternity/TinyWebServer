@@ -4,7 +4,7 @@
 #include "Connector.h"
 #include "EventLoop.h"
 #include "Channel.h"
-using namespace WebServer;
+using namespace xnet;
 
 const int Connector::kMaxRetryDelayMs;
 const int Connector::kInitRetryDelayMs;

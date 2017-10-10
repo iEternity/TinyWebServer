@@ -10,7 +10,7 @@
 #include "../base/Mutex.h"
 #include "../base/Condition.h"
 
-namespace WebServer
+namespace xnet
 {
 
 class EventLoop;

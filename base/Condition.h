@@ -9,7 +9,7 @@
 #include "Mutex.h"
 #include <pthread.h>
 
-namespace WebServer
+namespace xnet
 {
 
 class Condition : boost ::noncopyable

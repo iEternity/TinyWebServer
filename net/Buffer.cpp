@@ -4,7 +4,7 @@
 #include "Buffer.h"
 #include "SocketOps.h"
 
-using namespace WebServer;
+using namespace xnet;
 
 const char Buffer::kCRLF[] = "\r\n";
 

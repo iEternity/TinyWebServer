@@ -7,15 +7,15 @@
 #include "Channel.h"
 #include "../base/WeakCallback.h"
 
-using namespace WebServer;
+using namespace xnet;
 using namespace std::placeholders;
 
-void WebServer::defaultMessageCallback(const TcpConnectionPtr &conn, Buffer *buffer, Timestamp receiveTime)
+void xnet::defaultMessageCallback(const TcpConnectionPtr &conn, Buffer *buffer, Timestamp receiveTime)
 {
     buffer->retrieveAll();
 }
 
-void WebServer::defaultConnectionCallback(const TcpConnectionPtr& conn)
+void xnet::defaultConnectionCallback(const TcpConnectionPtr& conn)
 {
 
 }

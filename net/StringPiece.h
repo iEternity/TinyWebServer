@@ -8,7 +8,7 @@
 #include <cstring>
 #include <iostream>
 
-namespace WebServer
+namespace xnet
 {
 
 class StringArg

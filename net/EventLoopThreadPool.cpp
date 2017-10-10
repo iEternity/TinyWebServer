@@ -5,7 +5,7 @@
 #include "EventLoopThread.h"
 #include <boost/implicit_cast.hpp>
 
-using namespace WebServer;
+using namespace xnet;
 
 EventLoopThreadPool::EventLoopThreadPool(EventLoop* loop, const std::string& name):
         baseLoop_(loop),

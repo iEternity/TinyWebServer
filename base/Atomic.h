@@ -7,7 +7,7 @@
 #include <boost/noncopyable.hpp>
 #include <atomic>
 
-namespace WebServer
+namespace xnet
 {
 namespace detail
 {
@@ -75,6 +75,6 @@ private:
     using AtomicInt32 = detail::AtomicIntegerT<int32_t>;
     using AtomicInt64 = detail::AtomicIntegerT<int64_t>;
 
-}   //namespace WebServer
+}   //namespace xNet
 
 #endif //WEBSERVER_ATOMIC_H
