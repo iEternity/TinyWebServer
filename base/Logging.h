@@ -6,6 +6,7 @@
 #define WEBSERVER_LOGGING_H
 #include <string.h>
 #include "LogStream.h"
+#include "Timestamp.h"
 
 namespace xnet
 {
@@ -14,13 +15,13 @@ namespace xnet
 #define LOG_DEBUG if(Logger::LogLevel() <= Logger::LogLevel::DEBUG) \
         Logger(__FILE__, __LINE__, Logger::LogLevel::DEBUG,__function__).stream()
 #define LOG_INFO if(Logger::LogLevel() <= Logger::LogLevel::INFO) \
-        Logger(__FILE__, __LINE__).stream()
+        Logger(__FILE__, __LINE__, Logger::LogLevel::INFO).stream()
 
 
 class Logger
 {
 public:
-    enum class LogLevel
+    enum LogLevel
     {
         TRACE,
         DEBUG,
@@ -43,7 +44,7 @@ public:
             {
                 data_ = slash + 1;
             }
-            size_ = static_cast<int>(strlen(data_));
+            size_ = strlen(data_);
         }
 
         explicit SourceFile(const char* fileName):
@@ -54,27 +55,34 @@ public:
             {
                 data_ = slash + 1;
             }
-            size_ = static_cast<int>(strlen(data_));
+            size_ = strlen(data_);
         }
 
         const char* data_;
-        int size_;
+        size_t size_;
     };
 
-    Logger(SourceFile file, int line);
-    Logger(SourceFile file, int line, LogLevel level);
-    Logger(SourceFile file, int line, LogLevel level, const char* func);
-    Logger(SourceFile file, int line, bool toAbort);
+    Logger(const SourceFile& file, int line, LogLevel level);
+    Logger(const SourceFile& file, int line, LogLevel level, const char* func);
+    Logger(const SourceFile& file, int line, bool toAbort);
     ~Logger();
 
     LogStream&          stream() { return stream_; }
     static LogLevel     logLevel();
     static void         setLogLevel(LogLevel level);
 
+    using OutputFunc = std::function<void(const char* msg, size_t len)>;
+    void setOutput(const OutputFunc&);
+    using FlushFunc = std::function<void()>;
+    void setFlush(const FlushFunc&);
 private:
+    void formatTime();
+    void finish();
+
     LogStream   stream_;
+    Timestamp   time_;
     LogLevel    level_;
-    SourceFile  file_;
+    SourceFile  fileName_;
     int         line_;
 };
 
