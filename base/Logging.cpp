@@ -16,6 +16,16 @@ namespace xnet
         return strerror_r(savedErrno, t_errnoBuf, sizeof t_errnoBuf);
     }
 
+    Logger::LogLevel initLogLevel()
+    {
+        if(::getenv("XNET_LOG_TRACE"))
+            return Logger::LogLevel::TRACE;
+        else if(::getenv("XNET_LOG_DEBUG"))
+            return Logger::LogLevel::DEBUG;
+        else
+            return Logger::LogLevel::INFO;
+    }
+
     const char* LogLevelName[] = {
             "TRACE ",
             "DEBUG ",
@@ -43,6 +53,7 @@ namespace xnet
 
     Logger::OutputFunc g_output = defaultOutput ;
     Logger::FlushFunc  g_flush = defaultFlush;
+    Logger::LogLevel   g_logLevel = initLogLevel();
 }
 
 using namespace xnet;
