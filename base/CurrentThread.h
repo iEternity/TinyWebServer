@@ -31,9 +31,9 @@ namespace CurrentThread
         return t_tidString;
     }
 
-    inline int tidStringLenght()
+    inline size_t tidStringLength()
     {
-        return t_tidStringLength;
+        return static_cast<size_t>(t_tidStringLength);
     }
 
     inline const char* name()
