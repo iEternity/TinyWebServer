@@ -1,25 +1,26 @@
-cmake_minimum_required(VERSION 3.7)
+cmake_minimum_required(VERSION 2.6)
 project(xNet)
 
-set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD 11
+)
 
-set(SOURCE_FILES
-        net/main.cpp
-        3rd/TinyXML2/tinyxml2.h 3rd/TinyXML2/tinyxml2.cpp
-        net/Socket.h net/InetAddress.h net/InetAddress.cpp net/Endian.h
-        net/SocketOps.h net/SocketOps.cpp net/Socket.cpp net/EventLoop.h
-        net/EventLoop.cpp net/Channel.cpp net/Channel.h base/Timestamp.h
-        base/Timestamp.cpp net/Poller.h net/Poller.cpp net/poller/PollPoller.h
-        net/poller/PollPoller.cpp net/poller/EpollPoller.h
-        net/poller/EpollPoller.cpp net/poller/DefaultPoller.cpp
-        base/Mutex.h base/Thread.h base/Thread.cpp base/Atomic.h
-        base/CurrentThread.h net/Timer.h net/Callbacks.h net/Timer.cpp
-        net/TimerId.h net/TimerQueue.h net/TimerQueue.cpp net/TcpServer.h
-        net/EventLoopThread.h net/EventLoopThread.cpp base/Condition.h
-        net/TcpServer.cpp net/EventLoopThreadPool.h
-        net/EventLoopThreadPool.cpp net/Acceptor.h net/Acceptor.cpp
-        net/Buffer.h net/Buffer.cpp net/StringPiece.h net/TcpConnection.h net/TcpConnection.cpp base/WeakCallback.h net/Connector.h net/Connector.cpp net/TcpClient.h net/TcpClient.cpp base/Logging.h base/Logging.cpp base/LogStream.h base/LogStream.cpp)
+enable_testing()
 
-include_directories(3rd/TinyXML2)
-link_libraries(-lpthread)
-add_executable(xNet ${SOURCE_FILES})
+set(EXECUTABLE_OUTPUT_PATH  ${PROJECT_BINARY_DIR}/bin)
+set(LIBRARY_OUTPUT_PATH  ${PROJECT_BINARY_DIR}/lib)
+
+find_package(Boost REQUIRED)
+find_package(Protobuf)
+
+if(Boost_FOUND)
+    message(STATUS "found boost")
+endif()
+if(Protobuf_FOUND)
+    message(STATUS "found protobuf")
+endif()
+
+include_directories(${Boost_INCLUDE_DIRECTORIES})
+include_directories(${PROJECT_SOURCE_DIR})
+
+add_subdirectory(xnet/base)
+add_subdirectory(xnet/net)
