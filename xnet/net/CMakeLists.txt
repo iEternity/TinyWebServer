@@ -43,7 +43,7 @@ set(headers
         Poller.h
         Socket.h
         SocketOps.h
-        StringPiece.h
+        ../base/StringPiece.h
         TcpClient.h
         TcpConnection.h
         TcpServer.h

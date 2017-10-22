@@ -4,17 +4,12 @@
 #include <ctime>
 #include "Logging.h"
 #include "CurrentThread.h"
+#include <xnet/base/Utility.h>
 
 namespace xnet
 {
     __thread time_t t_lastTime;
     __thread char   t_time[32];
-    __thread char   t_errnoBuf[512];
-
-    const char* strError(int savedErrno)
-    {
-        return strerror_r(savedErrno, t_errnoBuf, sizeof t_errnoBuf);
-    }
 
     Logger::LogLevel initLogLevel()
     {
@@ -108,7 +103,7 @@ Logger::Logger(const SourceFile& file, int line, bool isAbort):
 
     stream_ << StringPiece(LogLevelName[level_]);
 
-    stream_ << strError(savedErrno) << " (errno=" << savedErrno << ") ";
+    stream_ << utility::errnoToString(savedErrno) << " (errno=" << savedErrno << ") ";
 }
 
 Logger::~Logger()
@@ -133,6 +128,7 @@ void Logger::formatTime()
 
     if(t_lastTime != seconds)
     {
+        t_lastTime = seconds;
         struct tm* tmTime = std::localtime(&seconds);
         snprintf(t_time, sizeof t_time, "%4d%02d%02d %02d:%02d:%02d",
                  tmTime->tm_year + 1900, tmTime->tm_mon + 1, tmTime->tm_mday,

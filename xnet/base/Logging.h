@@ -10,13 +10,20 @@
 
 namespace xnet
 {
-#define LOG_TRACE if(Logger::LogLevel() <= Logger::LogLevel::TRACE) \
-        Logger(__FILE__, __LINE__, Logger::LogLevel::TRACE, __function__).stream()
-#define LOG_DEBUG if(Logger::LogLevel() <= Logger::LogLevel::DEBUG) \
-        Logger(__FILE__, __LINE__, Logger::LogLevel::DEBUG,__function__).stream()
-#define LOG_INFO if(Logger::LogLevel() <= Logger::LogLevel::INFO) \
-        Logger(__FILE__, __LINE__, Logger::LogLevel::INFO).stream()
+#define LOG_TRACE if(xnet::Logger::logLevel() <= xnet::Logger::LogLevel::TRACE) \
+        xnet::Logger(__FILE__, __LINE__, xnet::Logger::LogLevel::TRACE, __FUNCTION__).stream()
 
+#define LOG_DEBUG if(xnet::Logger::logLevel() <= xnet::Logger::LogLevel::DEBUG) \
+        xnet::Logger(__FILE__, __LINE__, xnet::Logger::LogLevel::DEBUG,__FUNCTION__).stream()
+
+#define LOG_INFO if(xnet::Logger::logLevel() <= xnet::Logger::LogLevel::INFO) \
+        xnet::Logger(__FILE__, __LINE__, xnet::Logger::LogLevel::INFO).stream()
+
+#define LOG_WARN        xnet::Logger(__FILE__, __LINE__, xnet::Logger::LogLevel::WARN).stream()
+#define LOG_ERROR       xnet::Logger(__FILE__, __LINE__, xnet::Logger::LogLevel::ERROR).stream()
+#define LOG_FATAL       xnet::Logger(__FILE__, __LINE__, xnet::Logger::LogLevel::FATAL).stream()
+#define LOG_SYSERR      xnet::Logger(__FILE__, __LINE__, false).stream()
+#define LOG_SYSFATAL    xnet::Logger(__FILE__, __LINE__, true).stream()
 
 class Logger
 {
@@ -87,7 +94,7 @@ private:
 };
 
 extern Logger::LogLevel g_logLevel;
-Logger::LogLevel Logger::logLevel()
+inline Logger::LogLevel Logger::logLevel()
 {
     return g_logLevel;
 }

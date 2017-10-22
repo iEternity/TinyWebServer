@@ -7,7 +7,7 @@
 #include <stdio.h>
 #include <string>
 #include <functional>
-#include "../net/StringPiece.h"
+#include "StringPiece.h"
 
 namespace xnet
 {

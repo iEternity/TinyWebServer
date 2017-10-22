@@ -1,4 +1,5 @@
-include_directories(..)
-#link_directories(../lib)
-#link_libraries(libxnet_base.a)
 add_executable(logging_test Logging_test.cpp)
+target_link_libraries(logging_test xnet_base)
+
+add_executable(file_util_test FileUtil_test.cpp)
+target_link_libraries(file_util_test xnet_base)

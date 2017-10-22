@@ -121,7 +121,7 @@ ThreadPool::Task ThreadPool::take()
     UniqueLock lock(mutex_);
     while(queue_.empty() && running_)
     {
-        notFull_.wait(lock);
+        notEmpty_.wait(lock);
     }
     Task task;
     if(!queue_.empty())

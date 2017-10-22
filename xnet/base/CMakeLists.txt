@@ -2,6 +2,7 @@ add_compile_options(-std=c++11)
 
 set(base_srcs
         Exception.cpp
+        FileUtil.cpp
         Logging.cpp
         LogStream.cpp
         Thread.cpp

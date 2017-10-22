@@ -10,9 +10,9 @@ namespace xnet
 {
 namespace detail
 {
-const char digits[] = "9,8,7,6,5,4,3,2,1,0,1,2,3,4,5,6,7,8,9";
-const char* zero = &digits[9];
-const char digitsHex[] = "0,1,2,3,4,5,6,7,8,9,A,B,C,D,E,F";
+const char digits[] = "9876543210123456789";
+const char* zero = digits + 9;
+const char digitsHex[] = "0123456789ABCDEF";
 
 template<typename T>
 size_t convert(char buf[], T value)

@@ -9,7 +9,7 @@
 #include <memory>
 #include "InetAddress.h"
 #include "../base/Timestamp.h"
-#include "StringPiece.h"
+#include "xnet/base/StringPiece.h"
 #include "Buffer.h"
 #include "Callbacks.h"
 

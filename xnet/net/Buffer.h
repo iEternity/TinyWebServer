@@ -10,7 +10,7 @@
 #include <algorithm>
 #include <assert.h>
 #include <cstring>
-#include "StringPiece.h"
+#include "xnet/base/StringPiece.h"
 #include "Endian.h"
 
 namespace xnet
