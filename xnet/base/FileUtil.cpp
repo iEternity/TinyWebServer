@@ -5,6 +5,7 @@
 #include <fcntl.h>
 #include <unistd.h>
 #include <sys/stat.h>
+#include "Utility.h"
 
 using namespace xnet;
 using namespace FileUtil;
@@ -106,4 +107,52 @@ int ReadSmallFile::readToBuffer(int* size)
     }
 
     return errorNo;
+}
+
+AppendFile::AppendFile(const string& fileName):
+    fp_(::fopen(fileName.data(), "ac")),
+    writenBytes_(0)
+{
+    ::setbuffer(fp_, buffer_, sizeof(buffer_));
+}
+
+AppendFile::~AppendFile()
+{
+    if(fp_ != nullptr)
+    {
+        ::fclose(fp_);
+    }
+}
+
+void AppendFile::append(const char* logline, const size_t len)
+{
+    size_t n = write(logline, len);
+    size_t remain = len - n;
+    while(remain > 0)
+    {
+        size_t x = write(logline + n, remain);
+        if(x == 0)
+        {
+            int errorNo = ferror(fp_);
+            if(errorNo)
+            {
+                fprintf(stderr, "AppendFile::append failed %s\n", utility::errnoToString(errorNo));
+            }
+            break;
+        }
+        n += x;
+        remain -= x;
+    }
+
+    writenBytes_ += len;
+}
+
+void AppendFile::flush()
+{
+    ::fflush(fp_);
+}
+
+size_t AppendFile::write(const char* logline, const size_t len)
+{
+    return ::fwrite_unlocked(logline, 1, len, fp_);
 }

@@ -48,8 +48,11 @@ public:
     explicit AppendFile(const string& fileName);
     ~AppendFile();
 
-    void append(const char* logLine, const size_t len);
+    void append(const char* logline, const size_t len);
     void flush();
+    size_t writtenBytes() const { return writenBytes_; }
+private:
+    size_t write(const char* logline, const size_t len);
 private:
     static const int kBufferSize = 64*1024;
 
