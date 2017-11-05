@@ -65,7 +65,7 @@ Timestamp ProcessInfo::startTime()
     return g_startTime;
 }
 
-int ProcessInfo::clockTickPerSecond()
+int ProcessInfo::clockTicksPerSecond()
 {
     return g_clockTicks;
 }
