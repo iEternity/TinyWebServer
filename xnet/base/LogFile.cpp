@@ -15,7 +15,7 @@ LogFile::LogFile(const string &basename,
         rollSize_(rollSize),
         flushInterval_(flushInterval),
         checkEveryN_(checkEveryN),
-        mutex_(threadSafe ? std::make_shared<std::mutex>() : nullptr),
+        mutex_(threadSafe ? new std::mutex() : nullptr),
         startOfPeriod_(0),
         lastRoll_(0),
         lastFlush_(0)
@@ -87,10 +87,11 @@ bool LogFile::rollFile()
 {
     time_t now = 0;
     string filename = getLogFileName(basename_, &now);
-    time_t start = now / kRollPerSeconds_ * kRollPerSeconds_;
 
     if(now > lastRoll_)
     {
+        time_t start = now / kRollPerSeconds_ * kRollPerSeconds_;
+
         lastRoll_ = now;
         lastFlush_ = now;
         startOfPeriod_ = start;
@@ -117,7 +118,7 @@ string LogFile::getLogFileName(const string& basename, time_t* now)
     filename += ProcessInfo::hostname();
 
     char pidBuf[32];
-    snprintf(buf, sizeof(buf), ".%d", ProcessInfo::pid());
+    snprintf(pidBuf, sizeof(pidBuf), ".%d", ProcessInfo::pid());
     filename += pidBuf;
 
     filename += ".log";
