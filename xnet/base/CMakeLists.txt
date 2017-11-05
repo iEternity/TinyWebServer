@@ -4,7 +4,9 @@ set(base_srcs
         Exception.cpp
         FileUtil.cpp
         Logging.cpp
+        LogFile.cpp
         LogStream.cpp
+        ProcessInfo.cpp
         Thread.cpp
         ThreadPool.cpp
         Timestamp.cpp
