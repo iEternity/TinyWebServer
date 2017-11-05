@@ -19,7 +19,7 @@ namespace ProcessInfo
     string      username();
     uid_t       euid();
     Timestamp   startTime();
-    int         clockTicksPerSecond;
+    int         clockTicksPerSecond();
     int         pageSize();
     bool        isDebugBuild();
 
