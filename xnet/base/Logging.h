@@ -78,10 +78,11 @@ public:
     static LogLevel     logLevel();
     static void         setLogLevel(LogLevel level);
 
-    using OutputFunc = std::function<void(const char* msg, size_t len)>;
-    void setOutput(const OutputFunc&);
-    using FlushFunc = std::function<void()>;
-    void setFlush(const FlushFunc&);
+    using OutputFunc    = std::function<void(const char* msg, size_t len)>;
+    using FlushFunc     = std::function<void()>;
+
+    static void setOutput(const OutputFunc&);
+    static void setFlush(const FlushFunc&);
 private:
     void formatTime();
     void finish();
