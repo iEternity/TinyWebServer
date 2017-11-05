@@ -13,8 +13,6 @@
 
 namespace xnet
 {
-namespace FileUtil
-{
 
 class LogFile : noncopyable
 {
@@ -49,8 +47,6 @@ private:
 
     const static int kRollPerSeconds_ = 60*60*24;
 };
-
-}
 
 }
 
