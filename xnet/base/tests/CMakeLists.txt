@@ -6,3 +6,6 @@ target_link_libraries(file_util_test xnet_base)
 
 add_executable(log_file_test LogFile_test.cpp)
 target_link_libraries(log_file_test xnet_base)
+
+add_executable(async_logging_test AsyncLogging_test.cpp)
+target_link_libraries(async_logging_test xnet_base)

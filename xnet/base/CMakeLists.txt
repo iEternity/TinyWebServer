@@ -1,6 +1,8 @@
 add_compile_options(-std=c++11)
 
 set(base_srcs
+        AsyncLogging.cpp
+        CountDownLatch.cpp
         Exception.cpp
         FileUtil.cpp
         Logging.cpp

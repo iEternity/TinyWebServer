@@ -8,6 +8,7 @@
 #include <mutex>
 #include <atomic>
 #include <condition_variable>
+#include <xnet/base/noncopyable.h>
 
 namespace xnet
 {
@@ -24,7 +25,7 @@ public:
     int getCount() const;
 
 private:
-    std::mutex              mutex_;
+    mutable std::mutex      mutex_;
     int                     count_;
     std::condition_variable condition_;
 };

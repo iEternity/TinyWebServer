@@ -13,7 +13,7 @@ CountDownLatch::CountDownLatch(int count):
 
 void CountDownLatch::wait()
 {
-    std::unique_lock lock(mutex_);
+    std::unique_lock<std::mutex> lock(mutex_);
     while(count_ > 0)
     {
         condition_.wait(lock);
@@ -22,7 +22,7 @@ void CountDownLatch::wait()
 
 void CountDownLatch::countDown()
 {
-    std::unique_lock lock(mutex_);
+    std::unique_lock<std::mutex> lock(mutex_);
     count_ --;
     if(count_ == 0)
     {
@@ -32,6 +32,6 @@ void CountDownLatch::countDown()
 
 int CountDownLatch::getCount() const
 {
-    std::unique_lock lock(mutex_);
+    std::unique_lock<std::mutex> lock(mutex_);
     return count_;
 }
