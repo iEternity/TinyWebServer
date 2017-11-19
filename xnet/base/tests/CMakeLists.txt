@@ -12,3 +12,6 @@ target_link_libraries(async_logging_test xnet_base)
 
 add_executable(blocking_queue_test BlockingQueue_test.cpp)
 target_link_libraries(blocking_queue_test xnet_base)
+
+add_executable(bounded_blocking_queue_test BoundedBlockingQueue_test.cpp)
+target_link_libraries(bounded_blocking_queue_test xnet_base)
