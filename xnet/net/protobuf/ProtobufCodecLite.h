@@ -73,6 +73,10 @@ public:
 
     const std::string& errorCodeToString(ErrorCode code);
 
+    void fillEmptyBuffer(Buffer* buffer, const Message& message);
+
+    int32_t checksum(const void* data, size_t len);
+
 private:
     static const int kHeaderLen = sizeof(int32_t);
     static const int kCheckSumLen = sizeof(int32_t);
