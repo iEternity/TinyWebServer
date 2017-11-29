@@ -23,6 +23,14 @@ class Channel;
 class TcpConnection : public std::enable_shared_from_this<TcpConnection>
 {
 public:
+    enum class StateE
+    {
+        kDisconnected,
+        kConnecting,
+        kConnected,
+        kDisconnecting
+    };
+public:
     TcpConnection(const TcpConnection&) = delete;
     TcpConnection& operator= (const TcpConnection&) = delete;
     TcpConnection(EventLoop* loop,
@@ -32,8 +40,11 @@ public:
                   const InetAddress& peerAddr);
     ~TcpConnection();
 
-    EventLoop*          getLoop() const { return loop_; }
-    const std::string&  name() const    { return name_; }
+    EventLoop*          getLoop() const         { return loop_; }
+    const std::string&  name() const            { return name_; }
+    bool                connected() const       { return state_ == StateE::kConnected; }
+    bool                disconnected() const    { return state_ == StateE::kDisconnected; }
+
     bool                getTcpInfo(struct tcp_info* tcpi) const;
     std::string         getTcpInfoString() const;
 
@@ -73,14 +84,6 @@ public:
     void connectEstablished();
     void connectDestroyed();
 private:
-    enum class StateE
-    {
-        kDisconnected,
-        kConnecting,
-        kConnected,
-        kDisconnecting
-    };
-
     void        setState(StateE s) { state_ = s; }
     const char* stateToString() const ;
 
@@ -97,6 +100,7 @@ private:
     void handleClose();
     void handleError();
 
+private:
     EventLoop*                  loop_;
     const std::string           name_;
     std::unique_ptr<Socket>     socket_;

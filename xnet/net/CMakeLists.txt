@@ -53,3 +53,4 @@ set(headers
 )
 install(FILES ${headers} DESTINATION include/xnet/net)
 
+add_subdirectory(protobuf)

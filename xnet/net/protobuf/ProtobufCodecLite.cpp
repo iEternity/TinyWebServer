@@ -1,18 +1,19 @@
 //
 // Created by zhangkuo on 17-11-20.
 //
-#include <unordered_map>
+#include <map>
 #include <google/protobuf/message.h>
 #include <zlib.h>
 #include <xnet/net/protobuf/ProtobufCodecLite.h>
 #include <xnet/net/TcpConnection.h>
+#include <xnet/base/Logging.h>
 
 using namespace xnet;
 
 void ProtobufCodecLite::send(const TcpConnectionPtr& conn, const Message& message)
 {
     Buffer buf;
-    fillEmptyBuffer(&buffer, message);
+    fillEmptyBuffer(&buf, message);
     conn->send(&buf);
 }
 
@@ -22,8 +23,8 @@ void ProtobufCodecLite::fillEmptyBuffer(Buffer* buffer, const Message& message)
 
     int size = serializeToBuffer(message, buffer);
 
-    int32_t checksum = checksum(buffer->peek(), buffer->readableBytes());
-    buffer->appendInt32(checksum);
+    int32_t checksumT = checksum(buffer->peek(), buffer->readableBytes());
+    buffer->appendInt32(checksumT);
 
     int32_t len = sockets::hostToNetwork32(buffer->readableBytes());
     buffer->prepend(&len, sizeof len);
@@ -39,12 +40,13 @@ int ProtobufCodecLite::serializeToBuffer(const Message& message, Buffer* buffer)
     int size = message.ByteSize();
     buffer->ensureWritableBytes(size + kChecksumLen);
 
-    uint8_t* start  = static_cast<uint8_t*>(buffer->beginWrite());
+    uint8_t* start  = reinterpret_cast<uint8_t*>(buffer->beginWrite());
     uint8_t* end    = message.SerializeWithCachedSizesToArray(start);
 
     if(end - start != size)
     {
-        ByteSizeConsistencyError(size, message.ByteSize(), static_cast<size_t>(end - start));
+        //ByteSizeConsistencyError(size, message.ByteSize(), static_cast<size_t>(end - start));
+        LOG_ERROR << "ProtobufCodecLite::serializeToBuffer ByteSizeConsistencyError";
     }
 
     buffer->hasWriten(size);
@@ -66,11 +68,11 @@ void ProtobufCodecLite::onMessage(const TcpConnectionPtr& conn, Buffer* buffer, 
         {
             if(rawMessageCallback_ && rawMessageCallback_(conn, StringPiece(buffer->peek(), len + kHeaderLen), receiveTime))
             {
-                buffer_->retrieve(kHeaderLen + len);
+                buffer->retrieve(kHeaderLen + len);
                 continue;
             }
-            MessagePtr message(prototype_.New());
-            ErrorCode error = parse(buffer->peek() + kHeaderLen, len, messagel.get());
+            MessagePtr message(prototype_->New());
+            ErrorCode error = parse(buffer->peek() + kHeaderLen, len, message.get());
             if(error == ErrorCode::kNoError)
             {
                 messageCallback_(conn, message, receiveTime);
@@ -92,13 +94,13 @@ void ProtobufCodecLite::onMessage(const TcpConnectionPtr& conn, Buffer* buffer, 
 ProtobufCodecLite::ErrorCode ProtobufCodecLite::parse(const char* data, int len, Message* message)
 {
     ErrorCode error = ErrorCode::kNoError;
-    if(validateChecksum())
+    if(validateChecksum(data, len))
     {
-        if(memcpy(data, tag_.data(), tag_.size()) == 0)
+        if(memcmp(data, tag_.data(), tag_.size()) == 0)
         {
             const char* d = data + tag_.size();
             size_t dataLen = len - tag_.size() - kChecksumLen;
-            if(parseFromBuffer(StringPiece(data, dataLen)))
+            if(parseFromBuffer(StringPiece(data, dataLen), message))
             {
                 error = ErrorCode::kNoError;
             }
@@ -121,15 +123,15 @@ ProtobufCodecLite::ErrorCode ProtobufCodecLite::parse(const char* data, int len,
 
 int32_t ProtobufCodecLite::checksum(const void* data, size_t len)
 {
-    return static_cast<int32_t>(::adler32(1, static_cast<Bytef*>(data), len));
+    return static_cast<int32_t>(::adler32(1, static_cast<const Bytef*>(data), len));
 }
 
 bool ProtobufCodecLite::validateChecksum(const char* data, size_t len)
 {
     int32_t exceptedChecksum = asInt32(data + len - kChecksumLen);
-    int32_t checksum = checksum(data, len);
+    int32_t checksumT = checksum(data, len);
 
-    return checksum == exceptedChecksum;
+    return checksumT == exceptedChecksum;
 }
 
 int32_t ProtobufCodecLite::asInt32(const char* data)
@@ -139,16 +141,16 @@ int32_t ProtobufCodecLite::asInt32(const char* data)
     return sockets::networkToHost32(ret);
 }
 
-std::unordered_map<ProtobufCodecLite::ErrorCode, std::string> errorMap = 
+std::map<ProtobufCodecLite::ErrorCode, std::string> errorMap =
 {
-    {ErrorCode::kNoError,               "NoError"},
-    {ErrorCode::kChecksumError,         "ChecksumError"},
-    {ErrorCode::kInvalidLength,         "InvalidLength"},
-    {ErrorCode::kInvalidNamLen,         "InvalidNameLen"},
-    {ErrorCode::kParseError,            "ParseError"},
-    {ErrorCode::kUnknownMessageType,    "UnknownMessageType"},
-}
-std::string& ProtobufCodecLite::errorCodeToString(ErrorCode error)
+    {ProtobufCodecLite::ErrorCode::kNoError,               "NoError"},
+    {ProtobufCodecLite::ErrorCode::kChecksumError,         "ChecksumError"},
+    {ProtobufCodecLite::ErrorCode::kInvalidLength,         "InvalidLength"},
+    {ProtobufCodecLite::ErrorCode::kInvalidNameLen,        "InvalidNameLen"},
+    {ProtobufCodecLite::ErrorCode::kParseError,            "ParseError"},
+    {ProtobufCodecLite::ErrorCode::kUnknownMessageType,    "UnknownMessageType"}
+};
+const std::string& ProtobufCodecLite::errorCodeToString(ErrorCode error)
 {
     return errorMap[error];
 }
@@ -158,7 +160,7 @@ void ProtobufCodecLite::defaultErrorCallback(const TcpConnectionPtr& conn,
                                              Timestamp receiveTime, 
                                              ErrorCode error)
 {
-    LOG_ERROR << "ProtobufCodecLite::defaultErrorCallback - " << errorToString(error);
+    LOG_ERROR << "ProtobufCodecLite::defaultErrorCallback - " << errorCodeToString(error);
     if(conn && conn->connected())
     {
         conn->shutdown();
