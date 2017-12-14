@@ -146,7 +146,7 @@ public:
 
     StringPiece toStringPiece() const
     {
-        StringPiece(peek(), readableBytes());
+        return StringPiece(peek(), readableBytes());
     }
 
     void append(const StringPiece& str)

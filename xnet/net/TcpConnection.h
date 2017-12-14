@@ -7,6 +7,7 @@
 
 #include <boost/noncopyable.hpp>
 #include <memory>
+#include <boost/any.hpp>
 #include "InetAddress.h"
 #include "../base/Timestamp.h"
 #include "xnet/base/StringPiece.h"
@@ -44,6 +45,8 @@ public:
     const std::string&  name() const            { return name_; }
     bool                connected() const       { return state_ == StateE::kConnected; }
     bool                disconnected() const    { return state_ == StateE::kDisconnected; }
+    const InetAddress&  localAddress() const    { return localAddr_; }
+    const InetAddress&  peerAddress() const     { return peerAddr_; }
 
     bool                getTcpInfo(struct tcp_info* tcpi) const;
     std::string         getTcpInfoString() const;
@@ -57,6 +60,17 @@ public:
     void setTcpNoDelay(bool on);
     void startRead();
     void stopRead();
+    bool isReading() const { return reading_; }; // NOT thread safe, may race with start/stopReadInLoop
+
+    void setContext(const boost::any& context)
+    {
+        context_ = context;
+    }
+
+    const boost::any& getContext() const
+    {
+        return context_;
+    }
 
     void setConnectionCallback(const ConnectionCallback& cb)
     {
@@ -119,6 +133,8 @@ private:
 
     Buffer inputBuffer_;
     Buffer outputBuffer_;
+
+    boost::any context_;
 };
 
 }

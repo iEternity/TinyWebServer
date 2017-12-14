@@ -1,5 +1,6 @@
 add_compile_options(-std=c++11)
 
+include(CheckFunctionExists)
 set(net_srcs
         poller/DefaultPoller.cpp
         poller/EpollPoller.cpp
@@ -54,3 +55,4 @@ set(headers
 install(FILES ${headers} DESTINATION include/xnet/net)
 
 add_subdirectory(protobuf)
+add_subdirectory(protorpc)

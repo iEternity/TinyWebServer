@@ -10,7 +10,7 @@ set(EXECUTABLE_OUTPUT_PATH  ${PROJECT_BINARY_DIR}/bin)
 set(LIBRARY_OUTPUT_PATH  ${PROJECT_BINARY_DIR}/lib)
 
 find_package(Boost REQUIRED)
-find_package(Protobuf)
+find_package(Protobuf REQUIRED)
 
 if(Boost_FOUND)
     message(STATUS "found boost")
@@ -20,6 +20,7 @@ if(Protobuf_FOUND)
 endif()
 
 include_directories(${Boost_INCLUDE_DIRECTORIES})
+include_directories(${Protobuf_INCLUDE_DIRECTORIES})
 include_directories(${PROJECT_SOURCE_DIR})
 
 add_subdirectory(xnet/base)

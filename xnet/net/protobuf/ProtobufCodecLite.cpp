@@ -26,7 +26,7 @@ void ProtobufCodecLite::fillEmptyBuffer(Buffer* buffer, const Message& message)
     int32_t checksumT = checksum(buffer->peek(), buffer->readableBytes());
     buffer->appendInt32(checksumT);
 
-    int32_t len = sockets::hostToNetwork32(buffer->readableBytes());
+    auto len = sockets::hostToNetwork32(buffer->readableBytes());
     buffer->prepend(&len, sizeof len);
 }
 

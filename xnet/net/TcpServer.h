@@ -6,11 +6,11 @@
 #define WEBSERVER_TCPSERVER_H
 #include <boost/noncopyable.hpp>
 #include <functional>
+#include <map>
+#include <atomic>
 #include "InetAddress.h"
 #include "Callbacks.h"
 #include <boost/scoped_ptr.hpp>
-#include <map>
-#include <atomic>
 
 namespace xnet
 {
@@ -45,6 +45,10 @@ public:
     void setThreadInitCallback(ThreadInitCallback&& cb)         { threadInitCallback_ = std::move(cb); }
 
     void start();
+
+    void setConnectionCallback(const ConnectionCallback & cb)       { connectionCallback_ = cb; }
+    void setMessageCallback(const MessageCallback& cb)              { messageCallback_ = cb; }
+    void setWriteCompleteCallback(const WriteCompleteCallback& cb)  { writeCompleteCallback_ = cb; }
 
 private:
     using ConnectionMap = std::map<std::string, TcpConnectionPtr >;

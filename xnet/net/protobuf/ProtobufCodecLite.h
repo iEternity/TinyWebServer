@@ -125,7 +125,10 @@ public:
                                 ErrorCallback errorCb = ProtobufCodecLite::defaultErrorCallback):
             messageCallback_(messageCb),
             codec_(&MSG::default_instance(),
-                   TAG)
+                   TAG,
+                    std::bind(&ProtobufCodecLiteT::onRpcMessage, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3),
+                    rawCb,
+                    errorCb)
     {
 
     }
