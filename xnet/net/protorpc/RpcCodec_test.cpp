@@ -6,9 +6,12 @@
 #include <xnet/net/protorpc/RpcCodec.h>
 #include <xnet/net/Buffer.h>
 #include <xnet/net/protorpc/rpc.pb.h>
+#include <xnet/net/protobuf/ProtobufCodecLite.h>
 
 using namespace std;
 using namespace xnet;
+
+MessagePtr g_messagePtr;
 
 void onRpcMessage(const TcpConnectionPtr& conn, const RpcMessagePtr& message, Timestamp receiveTime)
 {
@@ -17,7 +20,7 @@ void onRpcMessage(const TcpConnectionPtr& conn, const RpcMessagePtr& message, Ti
 
 void onMessage(const TcpConnectionPtr& conn, const MessagePtr& message, Timestamp receiveTime)
 {
-
+    g_messagePtr = message;
 }
 
 void print(const Buffer& buf)
@@ -49,4 +52,21 @@ int main()
 
         assert(excepted == s1);
     }
+
+    {
+        ProtobufCodecLite codec(&RpcMessage::default_instance(), "RPC0", onMessage);
+        codec.fillEmptyBuffer(&buf2, message);
+        print(buf2);
+        s2 = buf2.toStringPiece().asString();
+
+        assert(excepted == s2);
+
+        codec.onMessage(TcpConnectionPtr(), &buf2, Timestamp::now());
+        assert(g_messagePtr);
+        assert(g_messagePtr->DebugString() == message.DebugString());
+
+        g_messagePtr.reset();
+    }
+
+    ::google::protobuf::ShutdownProtobufLibrary();
 }
