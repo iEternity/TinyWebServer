@@ -77,6 +77,7 @@ void RpcChannel::onRpcMessage(const TcpConnectionPtr& conn, const RpcMessagePtr&
     }
     else if(message.type() == ERROR)
     {
+        LOG_ERROR << "onRpcMessage type error";
     }
 }
 
