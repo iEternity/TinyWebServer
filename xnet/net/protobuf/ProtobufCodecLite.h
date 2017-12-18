@@ -44,6 +44,10 @@ public:
         kParseError
     };
 
+    static const int kHeaderLen = sizeof(int32_t);
+    static const int kChecksumLen = sizeof(int32_t);
+    static const int kMaxMessageLen = 64*1024*1024;
+
     using Message = ::google::protobuf::Message;
     using RawMessageCallback = std::function<bool (const TcpConnectionPtr&, 
                                                    const StringPiece&, 
@@ -95,10 +99,6 @@ public:
     static void defaultErrorCallback(const TcpConnectionPtr& conn, Buffer* buffer, Timestamp receiveTime, ErrorCode error);
 
 private:
-    static const int kHeaderLen = sizeof(int32_t);
-    static const int kChecksumLen = sizeof(int32_t);
-    static const int kMaxMessageLen = 64*1024*1024;
-
     const Message* prototype_;
     const std::string tag_;
     ProtobufMessageCallback messageCallback_;

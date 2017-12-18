@@ -17,43 +17,6 @@ void ProtobufCodecLite::send(const TcpConnectionPtr& conn, const Message& messag
     conn->send(&buf);
 }
 
-void ProtobufCodecLite::fillEmptyBuffer(Buffer* buffer, const Message& message)
-{
-    buffer->append(tag_);
-
-    int size = serializeToBuffer(message, buffer);
-
-    int32_t checksumT = checksum(buffer->peek(), buffer->readableBytes());
-    buffer->appendInt32(checksumT);
-
-    auto len = sockets::hostToNetwork32(buffer->readableBytes());
-    buffer->prepend(&len, sizeof len);
-}
-
-bool ProtobufCodecLite::parseFromBuffer(const StringPiece& buffer, Message* message)
-{
-    return message->ParseFromArray(buffer.data(), buffer.size());
-}
-
-int ProtobufCodecLite::serializeToBuffer(const Message& message, Buffer* buffer)
-{
-    int size = message.ByteSize();
-    buffer->ensureWritableBytes(size + kChecksumLen);
-
-    uint8_t* start  = reinterpret_cast<uint8_t*>(buffer->beginWrite());
-    uint8_t* end    = message.SerializeWithCachedSizesToArray(start);
-
-    if(end - start != size)
-    {
-        //ByteSizeConsistencyError(size, message.ByteSize(), static_cast<size_t>(end - start));
-        LOG_ERROR << "ProtobufCodecLite::serializeToBuffer ByteSizeConsistencyError";
-    }
-
-    buffer->hasWriten(size);
-
-    return size;
-}
-
 void ProtobufCodecLite::onMessage(const TcpConnectionPtr& conn, Buffer* buffer, Timestamp receiveTime)
 {
     while(buffer->readableBytes() >= static_cast<uint32_t>(kHeaderLen + kMinMessageLen))
@@ -64,7 +27,7 @@ void ProtobufCodecLite::onMessage(const TcpConnectionPtr& conn, Buffer* buffer, 
             errorCallback_(conn, buffer, receiveTime, ErrorCode::kInvalidLength);
             break;
         }
-        else if(len >= static_cast<uint32_t>(buffer->readableBytes()))
+        else if(buffer->readableBytes() >= static_cast<size_t>(kHeaderLen + len))
         {
             if(rawMessageCallback_ && rawMessageCallback_(conn, StringPiece(buffer->peek(), len + kHeaderLen), receiveTime))
             {
@@ -91,6 +54,38 @@ void ProtobufCodecLite::onMessage(const TcpConnectionPtr& conn, Buffer* buffer, 
     }
 }
 
+void ProtobufCodecLite::fillEmptyBuffer(Buffer* buffer, const Message& message)
+{
+    buffer->append(tag_);
+
+    int size = serializeToBuffer(message, buffer);
+
+    int32_t checksumT = checksum(buffer->peek(), buffer->readableBytes());
+    buffer->appendInt32(checksumT);
+
+    auto len = sockets::hostToNetwork32(buffer->readableBytes());
+    buffer->prepend(&len, sizeof len);
+}
+
+int ProtobufCodecLite::serializeToBuffer(const Message& message, Buffer* buffer)
+{
+    int size = message.ByteSize();
+    buffer->ensureWritableBytes(size + kChecksumLen);
+
+    uint8_t* start  = reinterpret_cast<uint8_t*>(buffer->beginWrite());
+    uint8_t* end    = message.SerializeWithCachedSizesToArray(start);
+
+    if(end - start != size)
+    {
+        //ByteSizeConsistencyError(size, message.ByteSize(), static_cast<size_t>(end - start));
+        LOG_ERROR << "ProtobufCodecLite::serializeToBuffer ByteSizeConsistencyError";
+    }
+
+    buffer->hasWriten(size);
+
+    return size;
+}
+
 ProtobufCodecLite::ErrorCode ProtobufCodecLite::parse(const char* data, int len, Message* message)
 {
     ErrorCode error = ErrorCode::kNoError;
@@ -100,7 +95,7 @@ ProtobufCodecLite::ErrorCode ProtobufCodecLite::parse(const char* data, int len,
         {
             const char* d = data + tag_.size();
             size_t dataLen = len - tag_.size() - kChecksumLen;
-            if(parseFromBuffer(StringPiece(data, dataLen), message))
+            if(parseFromBuffer(StringPiece(d, dataLen), message))
             {
                 error = ErrorCode::kNoError;
             }
@@ -119,6 +114,11 @@ ProtobufCodecLite::ErrorCode ProtobufCodecLite::parse(const char* data, int len,
         error = ErrorCode::kChecksumError;
     }
     return error;
+}
+
+bool ProtobufCodecLite::parseFromBuffer(const StringPiece& buffer, Message* message)
+{
+    return message->ParseFromArray(buffer.data(), buffer.size());
 }
 
 int32_t ProtobufCodecLite::checksum(const void* data, size_t len)
