@@ -1,5 +1,6 @@
 #pragma once
 #include <map>
+#include <vector>
 #include <boost/algorithm/string.hpp>
 #include <xnet/base/Types.h>
 #include <xnet/base/Timestamp.h>
@@ -89,7 +90,36 @@ public:
 
     void addHeader(const string& line)
     {
-        
+        boost::trim(line);
+
+        std::vector<string> result;
+        boost::split(result, line, boost::is_any_of(": "), boost::token_compress_on);
+        headers_[result[0]] = result[1];
+    }
+
+    string getHeader(const string& field) const
+    {
+        string result;
+        auto it = headers_.find(field);
+        if(it != headers_.end())
+        {
+            result = it->second;
+        }
+        return result;
+    }
+    const std::map<string, string>& getHeaders() const
+    {
+        return headers_;
+    }
+
+    void swap(HttpRequest& that)
+    {
+        std::swap(method_, that.method_);
+        std::swap(version_, that.version_);
+        path_.swap(that.path_);
+        query_.swap(that.query_);
+        receiveTime_.swap(that.receiveTime_);
+        headers_.swap(that.headers_);
     }
 
 private:
