@@ -67,16 +67,25 @@ public:
         return m[method_];
     }
 
-    void setQuery(const char* start, const char* end) 
+    void setQuery(const string& s) 
     { 
-        query_ = string(start, end); 
+        query_ = s; 
+    }
+    void setQuery(string&& s)
+    {
+        query_ = std::move(s);
     }
     string getQuery() const { return query_; }
 
-    void setPath(const char* start, const char* end) 
+    void setPath(const string& s) 
     { 
-        path_ = string(start, end); 
+        path_ = s; 
     }
+    void setPath(string&& s)
+    {
+        path_ = std::move(s);
+    }
+
     string getPath() const { return path_; }
 
     void setReceiveTime(const Timestamp& t)
@@ -88,13 +97,22 @@ public:
         return receiveTime_;
     }
 
-    void addHeader(const string& line)
+    bool addHeader(const char* begin, const char* end)
     {
+        string line(begin, end);
         boost::trim(line);
 
         std::vector<string> result;
         boost::split(result, line, boost::is_any_of(": "), boost::token_compress_on);
-        headers_[result[0]] = result[1];
+        if(result.size() == 2)
+        {
+            headers_[result[0]] = result[1];
+        }
+        else
+        {
+            return false;
+        }
+        return true;
     }
 
     string getHeader(const string& field) const
@@ -129,16 +147,6 @@ private:
     string      query_;
     Timestamp   receiveTime_;
     std::map<string, string> headers_;
-
-    static std::map<Method, string> methodString_ = 
-    {
-        {Method::kGet,      "GET"},
-        {Method::kPost,     "POST"},
-        {Method::kPut,      "PUT"},
-        {Method::kDelete,   "DELETE"},
-        {Method::kHead,     "HEAD"},
-        {Method::kInvalid,  "UNKNOWN"}
-    }
 };
 
 }

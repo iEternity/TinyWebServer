@@ -29,7 +29,7 @@ public:
     HttpRequest& request() const { return request_; }
 
 private:
-    bool parseRequestLine(const string& line);
+    bool parseRequestLine(const char* begin, const char* end);
 
 private:
     HttpRequestParseState state_;
