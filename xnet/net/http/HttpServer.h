@@ -15,11 +15,13 @@ public:
                const string& name,
                TcpServer::Option option = TcpServer::Option::kNoReusePort);
 
-    ~HttpServer();
+    ~HttpServer(){};
 
     void start();
 
-    
+private:
+    void onConnection(const TcpConnectionPtr& conn);
+    void onMessage(const TcpConnectionPtr& conn, Buffer* buf, Timestamp receiveTime);
 
 private:
     TcpServer       server_;
