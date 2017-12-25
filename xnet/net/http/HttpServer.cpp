@@ -1,4 +1,5 @@
 #include <xnet/net/http/HttpServer.h>
+#include <xnet/net/http/HttpContext.h>
 
 using namespace std;
 using namespace xnet;
@@ -24,15 +25,39 @@ HttpServer::HttpServer(EventLoop* loop,
 
 void HttpServer::start()
 {
+    LOG_WARN << "HttpServer[" << server_.name() << "] starts listening on " << server_.toIpPort();
     server_.start();
 }
 
 void HttpServer::onConnection(const TcpConnectionPtr& conn)
 {
-
+    if(conn->connected())
+    {
+        conn->setContext(HttpContext());
+    }
 }
 
 void HttpServer::onMessage(const TcpConnectionPtr& conn, Buffer* buf, Timestamp receiveTime)
 {
+    auto context = boost::any_cast<HttpContext>(conn->getMutableContext());
+    if(!context->parse(buf, receiveTime))
+    {
+        conn->send("HTTP/1.1 400 Bad Request");
+        conn->shutdown();
+    }
 
+    if(context->hasGotAll())
+    {
+        onRequest(conn, context->request());
+        context->reset();
+    }
+}
+
+void HttpServer::onRequest(const TcpConnectionPtr& conn, const HttpRequest& request)
+{
+    const string& connection = request.getHeader("Connection");
+    bool isClose = (connection == "close") ||
+        (request.getVersion() == HttpRequest::Version::kHttp10 && connection != "Keep-Alive");
+
+    
 }

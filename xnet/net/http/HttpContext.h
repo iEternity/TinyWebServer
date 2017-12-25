@@ -24,7 +24,7 @@ public:
 
     bool parseRequest(Buffer* buf, Timestamp receiveTime);
 
-    bool isGotAll() const { state_ == HttpRequestParseState::kGotAll; }
+    bool hasGotAll() const { state_ == HttpRequestParseState::kGotAll; }
     const HttpRequest& request() const { return request_; }
     HttpRequest& request() const { return request_; }
 
