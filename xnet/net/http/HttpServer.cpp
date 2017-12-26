@@ -59,5 +59,15 @@ void HttpServer::onRequest(const TcpConnectionPtr& conn, const HttpRequest& requ
     bool isClose = (connection == "close") ||
         (request.getVersion() == HttpRequest::Version::kHttp10 && connection != "Keep-Alive");
 
-    
+    HttpResponse response(isClose);
+    httpCallback_(request, &response);
+
+    Buffer buf;
+    response.appendToBuffer(&buf);
+    conn->send(&buf);
+
+    if(response.isCloseConnection())
+    {
+        conn->shutdown();
+    }
 }
