@@ -129,7 +129,7 @@ int32_t ProtobufCodecLite::checksum(const void* data, size_t len)
 bool ProtobufCodecLite::validateChecksum(const char* data, size_t len)
 {
     int32_t exceptedChecksum = asInt32(data + len - kChecksumLen);
-    int32_t checksumT = checksum(data, len);
+    int32_t checksumT = checksum(data, len - kChecksumLen);
 
     return checksumT == exceptedChecksum;
 }

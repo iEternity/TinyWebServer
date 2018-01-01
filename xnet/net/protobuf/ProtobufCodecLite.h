@@ -66,7 +66,7 @@ public:
                       const StringPiece& tag, 
                       const ProtobufMessageCallback& messageCb,
                       const RawMessageCallback& rawMessageCb = RawMessageCallback(),
-                      const ErrorCallback& errorCb = ErrorCallback()) :
+                      const ErrorCallback& errorCb = defaultErrorCallback) :
         prototype_(prototype),
         tag_(tag.asString()),
         messageCallback_(messageCb),

@@ -61,7 +61,7 @@ int main()
 
         assert(excepted == s2);
 
-        codec.onMessage(TcpConnectionPtr(), &buf2, Timestamp::now());
+        codec.onMessage(TcpConnectionPtr(), &buf1, Timestamp::now());
         assert(g_messagePtr);
         assert(g_messagePtr->DebugString() == message.DebugString());
 
