@@ -16,7 +16,7 @@ public:
         k301MovedPermanently = 301,
         k400BadRequest = 400,
         k404NotFound = 404
-    }
+    };
 public:
     explicit HttpResponse(bool isClose):
         isCloseConnection_(isClose),

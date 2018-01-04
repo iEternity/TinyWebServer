@@ -52,7 +52,7 @@ public:
 		return method_ != Method::kInvalid;
     }
     Method getMethod() const { return method_; }
-    string methodString()
+    string methodString() const
     {
         std::map<Method, string> m =
         {

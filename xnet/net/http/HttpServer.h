@@ -1,6 +1,8 @@
 #pragma once
 #include <xnet/base/noncopyable.h>
 #include <xnet/net/TcpServer.h>
+#include <xnet/net/http/HttpRequest.h>
+#include <xnet/net/http/HttpResponse.h>
 
 namespace xnet
 {
@@ -17,6 +19,8 @@ public:
 
     ~HttpServer(){};
 
+    void setHttpCallback(const HttpCallback& cb) { httpCallback_ = cb; }
+    void setThreadNum(int numThreads) { server_.setThreadNum(numThreads); }
     void start();
 
 private:

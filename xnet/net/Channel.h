@@ -5,23 +5,24 @@
 #ifndef WEBSERVER_CHANNEL_H
 #define WEBSERVER_CHANNEL_H
 
-#include "EventLoop.h"
-#include <boost/noncopyable.hpp>
 #include <functional>
 #include <memory>
-#include "../base/Timestamp.h"
+#include <xnet/net/EventLoop.h>
+#include <xnet/base/noncopyable.h>
+#include <xnet/base/Timestamp.h>
 
 namespace xnet
 {
 
 class EventLoop;
 
-class Channel : boost::noncopyable
+class Channel : noncopyable
 {
 public:
     using EventCallback = std::function<void()>;
     using ReadEventCallback = std::function<void(Timestamp)>;
 
+public:
     Channel(EventLoop* loop, int fd);
     ~Channel();
 
@@ -61,15 +62,17 @@ public:
 
 private:
     void update();
+    void handleEventWithGuard(Timestamp receiveTime);
 
+private:
     static const int kNoneEvent;
     static const int kReadEvent;
     static const int kWriteEvent;
 
     EventLoop* loop_;
     const int fd_;
-    int events_;
-    int revents_;
+    int events_;    //关心的事件
+    int revents_;   //发生的事件
     int index_;
 
     bool addedToLoop_;

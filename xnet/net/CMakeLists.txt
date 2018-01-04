@@ -56,3 +56,4 @@ install(FILES ${headers} DESTINATION include/xnet/net)
 
 add_subdirectory(protobuf)
 add_subdirectory(protorpc)
+add_subdirectory(http)

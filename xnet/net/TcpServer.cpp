@@ -2,11 +2,12 @@
 // Created by zhangkuo on 17-9-14.
 //
 
-#include "TcpServer.h"
-#include "EventLoop.h"
-#include "Acceptor.h"
-#include "EventLoopThreadPool.h"
-#include "TcpConnection.h"
+#include <xnet/net/TcpServer.h>
+#include <xnet/net/EventLoop.h>
+#include <xnet/net/Acceptor.h>
+#include <xnet/net/EventLoopThreadPool.h>
+#include <xnet/net/TcpConnection.h>
+#include <xnet/base/Logging.h>
 
 using namespace xnet;
 using namespace std::placeholders;
@@ -30,10 +31,12 @@ TcpServer::TcpServer(EventLoop* loop,
 
 TcpServer::~TcpServer()
 {
-    for(auto& p : connections_)
+    LOG_TRACE << "TcpServer::~TcpServer [" << name_ << "] destructing";
+    for(auto& it : connections_)
     {
-        auto connection = p.second;
-        connection->getLoop()->runInLoop(std::bind(&TcpConnection::connectDestroyed, connection));
+        auto conn = it.second;
+        it.second.reset();
+        conn->getLoop()->runInLoop(std::bind(&TcpConnection::connectDestroyed, conn));
     }
 }
 

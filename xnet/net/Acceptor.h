@@ -5,20 +5,21 @@
 #ifndef WEBSERVER_ACCEPTOR_H
 #define WEBSERVER_ACCEPTOR_H
 
-#include <boost/noncopyable.hpp>
-#include "Socket.h"
-#include "Channel.h"
+#include <xnet/base/noncopyable.h>
+#include <xnet/net/Socket.h>
+#include <xnet/net/Channel.h>
 
 namespace xnet
 {
 class EventLoop;
 class InetAddress;
 
-class Acceptor : boost::noncopyable
+class Acceptor : noncopyable
 {
 public:
     using NewConnectionCallback = std::function<void(int fd, InetAddress)>;
 
+public:
     Acceptor(EventLoop* loop, const InetAddress& listenAddr, bool reuseport);
     ~Acceptor();
 
@@ -30,9 +31,11 @@ public:
     bool listening() const { return listening_; }
 
     void listen();
+
 private:
     void handleRead();
 
+private:
     EventLoop* loop_;
     Socket acceptSocket_;
     Channel acceptChannel_;

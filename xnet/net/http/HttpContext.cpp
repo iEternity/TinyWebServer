@@ -90,11 +90,11 @@ bool HttpContext::parseRequestLine(const char* begin, const char* end)
         string v = result[2].substr(result[2].find('/'));
         if(v == "1.1")
         {
-            request_.setVersion(Version::kHttp11);
+            request_.setVersion(HttpRequest::Version::kHttp11);
         }
         else if(v == "1.0")
         {
-            request_.setVersion(Version::kHttp10);
+            request_.setVersion(HttpRequest::Version::kHttp10);
         }
     }
     else

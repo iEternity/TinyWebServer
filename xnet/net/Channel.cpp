@@ -1,8 +1,8 @@
 //
 // Created by zhangkuo on 17-8-7.
 //
-#include "Channel.h"
 #include <poll.h>
+#include <xnet/net/Channel.h>
 using namespace xnet;
 
 const int Channel::kNoneEvent = 0;
@@ -26,6 +26,22 @@ Channel::~Channel()
 }
 
 void Channel::handleEvent(Timestamp receiveTime)
+{
+    if(tied_)
+    {
+        std::shared_ptr<void> guard = tie_.lock();
+        if(guard)
+        {
+            handleEventWithGuard(receiveTime);
+        }
+    }
+    else
+    {
+        handleEventWithGuard(receiveTime);
+    }
+}
+
+void Channel::handleEventWithGuard(Timestamp receiveTime)
 {
 
 }

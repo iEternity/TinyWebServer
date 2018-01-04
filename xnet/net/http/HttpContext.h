@@ -26,7 +26,14 @@ public:
 
     bool hasGotAll() const { state_ == HttpRequestParseState::kGotAll; }
     const HttpRequest& request() const { return request_; }
-    HttpRequest& request() const { return request_; }
+    HttpRequest& request() { return request_; }
+
+    void reset()
+    {
+        state_ = HttpRequestParseState::kExpectRequestLine;
+        HttpRequest dummy;
+        request_.swap(dummy);
+    }
 
 private:
     bool parseRequestLine(const char* begin, const char* end);

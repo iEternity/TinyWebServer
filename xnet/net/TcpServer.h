@@ -4,13 +4,12 @@
 
 #ifndef WEBSERVER_TCPSERVER_H
 #define WEBSERVER_TCPSERVER_H
-#include <boost/noncopyable.hpp>
 #include <functional>
 #include <map>
 #include <atomic>
-#include "InetAddress.h"
-#include "Callbacks.h"
-#include <boost/scoped_ptr.hpp>
+#include <xnet/net/InetAddress.h>
+#include <xnet/net/Callbacks.h>
+#include <xnet/base/noncopyable.h>
 
 namespace xnet
 {
@@ -19,16 +18,18 @@ class EventLoop;
 class Acceptor;
 class EventLoopThreadPool;
 
-class TcpServer : boost::noncopyable
+class TcpServer : noncopyable
 {
 public:
     using ThreadInitCallback = std::function<void(EventLoop*)>;
+
     enum Option
     {
         kNoReusePort,
         kReusePort,
     };
 
+public:
     TcpServer(EventLoop* loop,
               const InetAddress& listenAddr,
               const std::string& nameArg,
@@ -44,19 +45,18 @@ public:
     void setThreadInitCallback(const ThreadInitCallback& cb)    { threadInitCallback_ = cb; }
     void setThreadInitCallback(ThreadInitCallback&& cb)         { threadInitCallback_ = std::move(cb); }
 
-    void start();
-
     void setConnectionCallback(const ConnectionCallback & cb)       { connectionCallback_ = cb; }
     void setMessageCallback(const MessageCallback& cb)              { messageCallback_ = cb; }
     void setWriteCompleteCallback(const WriteCompleteCallback& cb)  { writeCompleteCallback_ = cb; }
 
-private:
-    using ConnectionMap = std::map<std::string, TcpConnectionPtr >;
+    void start();
 
+private:
     void newConnection(int sockfd, const InetAddress& peerAddr);
     void removeConnection(const TcpConnectionPtr& conn);
     void removeConnectionInLoop(const TcpConnectionPtr& conn);
 
+private:
     EventLoop*                              loop_;
     const std::string                       ipPort_;
     const std::string                       name_;
@@ -64,13 +64,12 @@ private:
     std::shared_ptr<EventLoopThreadPool>    threadPool_;
     std::atomic<bool>                       started_;
     int                                     nextConnId_;
+    std::map<std::string, TcpConnectionPtr> connections_;
 
     ConnectionCallback      connectionCallback_;
     MessageCallback         messageCallback_;
     WriteCompleteCallback   writeCompleteCallback_;
     ThreadInitCallback      threadInitCallback_;
-
-    ConnectionMap       connections_;
 };
 
 }
