@@ -60,9 +60,15 @@ public:
 
     void remove();
 
+    // for debug
+    std::string eventsToString() const;
+    std::string reventsToString() const;
+
 private:
     void update();
     void handleEventWithGuard(Timestamp receiveTime);
+
+    std::string eventsToString(int fd, int event)
 
 private:
     static const int kNoneEvent;

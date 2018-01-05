@@ -43,7 +43,25 @@ void Channel::handleEvent(Timestamp receiveTime)
 
 void Channel::handleEventWithGuard(Timestamp receiveTime)
 {
+    if((revents_ & POLLHUP) !(revents_ & POLLIN))
+    {
+        if(closeCallback_) closeCallback_();
+    }
 
+    if(revents_ & (POLLERR | POLLNVAL))
+    {
+        if(errorCallback_) errorCallback_();
+    }
+
+    if(revents_ & (POLLIN | POLLPRI | POLLRDHUP))
+    {
+        if(readCallback_) readCallback_();
+    }
+
+    if(revents_ & POLLOUT)
+    {
+        if(writeCallback_) writeCallback_();
+    }
 }
 
 
