@@ -1,143 +1,69 @@
 //
 // Created by zhangkuo on 17-8-18.
 //
-#include "Thread.h"
-#include "CurrentThread.h"
-#include "Timestamp.h"
-#include <sys/syscall.h>
 #include <sys/prctl.h>
+#include <sstream>
+#include <iostream>
+#include <xnet/base/Thread.h>
+#include <xnet/base/CurrentThread.h>
+#include <xnet/base/Timestamp.h>
+#include <xnet/base/Exception.h>
 
 namespace xnet
 {
 
 namespace CurrentThread
 {
-    __thread int t_cachedTid = 0;
-    __thread char t_tidString[32];
-    __thread int t_tidStringLength = 6;
-    __thread const char* t_threadName = "unkonwn";
-}
+    thread_local int t_cachedTid = 0;
+    thread_local std::string t_tidString = "0";
+    thread_local std::string t_threadName = "unknown";
 
-namespace detail
-{
-
-pid_t gettid()
-{
-    return static_cast<pid_t>(::syscall(SYS_gettid));
-}
-
-void afterFork()
-{
-    CurrentThread::t_cachedTid = 0;
-    CurrentThread::t_threadName = "main";
-    CurrentThread::cacheTid();
-}
-
-class ThreadNameInitializer
-{
-public:
-    ThreadNameInitializer()
+    // fork 之后清空已经缓存的线程信息
+    void afterFork()
     {
-        CurrentThread::t_threadName = "main";
-        CurrentThread::tid();
+        t_cachedTid = 0;
+        t_threadName = "main";
+        tid();
+    }
+
+    int init()
+    {
+        tid();
+        t_threadName = "main";
         pthread_atfork(NULL, NULL, &afterFork);
+
+        return 0;
     }
+}  //namespace CurrentThread
+}   //namespace xnet
 
-};
 
-ThreadNameInitializer init;
-
-struct ThreadData
-{
-    using ThreadFunc = Thread::ThreadFunc;
-    using WkTid = std::weak_ptr<pid_t>;
-
-    ThreadFunc func_;
-    std::string name_;
-    WkTid wkTid_;
-
-    ThreadData(const ThreadFunc& func, const std::string name, const WkTid& tid)
-            : func_(func),
-              name_(name),
-              wkTid_(tid)
-    {
-    }
-
-    void runInThread()
-    {
-        pid_t tid = CurrentThread::tid();
-
-        std::shared_ptr<pid_t> pTid = wkTid_.lock();
-        if (pTid)
-        {
-            *pTid = tid;
-            pTid.reset();
-        }
-
-        xnet::CurrentThread::t_threadName = name_.empty() ? "webServerThread" : name_.c_str();
-        ::prctl(PR_SET_NAME, CurrentThread::t_threadName);
-
-        func_();
-        CurrentThread::t_threadName = "finished";
-    }
-};
-
-void* startThread(void* obj)
-{
-    ThreadData* pData = static_cast<ThreadData*>(obj);
-    pData->runInThread();
-
-    delete pData;
-    return nullptr;
-}
-
-}   //namespace detail
-}   //namespace xNet
+int dummy = xnet::CurrentThread::init();
 
 using namespace xnet;
+using namespace std;
 
-void CurrentThread::cacheTid()
-{
-    if (t_cachedTid == 0)
-    {
-        t_cachedTid = detail::gettid();
-        t_tidStringLength = snprintf(t_tidString, sizeof t_tidString, "%5d ", t_cachedTid);
-    }
-}
+atomic<int> Thread::numCreated_ = { 0 };
 
-bool CurrentThread::isMainThread()
-{
-    return t_cachedTid == ::getpid();
-}
-
-void CurrentThread::sleepUsec(int64_t usec)
-{
-    struct timespec ts = {0, 0};
-    ts.tv_sec = static_cast<time_t>(usec / Timestamp::kMicrosecondsPerSecond);
-    ts.tv_nsec = static_cast<long>(usec % Timestamp::kMicrosecondsPerSecond * 1000);
-
-    ::nanosleep(&ts, NULL);
-}
-
-AtomicInt32 Thread::numCreated_;
 Thread::Thread(const ThreadFunc& func, const std::string& name)
-        : started_(false),
+        : func_(func),
+          name_(name),
+          started_(false),
           joined_(false),
-          pthreadId_(0),
-          tid_(new pid_t(0)),
-          func_(func),
-          name_(name)
+          tid_(0),
+          latch_(1)
 {
     setDefaultName();
 }
 
 Thread::Thread(ThreadFunc&& func, const std::string& name)
-        : started_(false),
+        : func_(std::move(func)),
+          name_(name),
+          started_(false),
           joined_(false),
-          pthreadId_(0),
-          tid_(new pid_t(0)),
-          func_(std::move(func)),
-          name_(name)
+          tid_(0),
+          latch_(1)
+
 {
     setDefaultName();
 }
@@ -146,35 +72,74 @@ Thread::~Thread()
 {
     if (started_ && !joined_)
     {
-        pthread_detach(pthreadId_);
+        thread_.detach();
     }
 }
 
 void Thread::setDefaultName()
 {
-    int num = numCreated_.incrementAndGet();
+    numCreated_++;
     if (name_.empty())
     {
-        char buf[32];
-        snprintf(buf, sizeof buf, "Thread%d", num);
-        name_ = buf;
+        std::ostringstream oss;
+        oss << "Thread" << numCreated_;
+        name_ = oss.str();
     }
 }
 
 void Thread::start()
 {
+    assert(!started_);
+
     started_ = true;
-    detail::ThreadData* pData = new detail::ThreadData(func_, name_, tid_);
-    if (pthread_create(&pthreadId_, NULL, detail::startThread, pData))
+    thread_ = std::thread(std::bind(&Thread::runInThread, this));
+    latch_.wait();
+}
+
+void Thread::join()
+{
+    assert(started_);
+    assert(!joined_);
+
+    joined_ = true;
+    thread_.join();
+}
+
+void Thread::runInThread()
+{
+    latch_.countDown();
+
+    tid_ = CurrentThread::tid();
+    CurrentThread::t_threadName = name_.empty() ? "xNetThread" : name_;
+    ::prctl(PR_SET_NAME, CurrentThread::t_threadName);
+
+    try
     {
-        started_ = false;
-        delete pData;
+        func_();
+        CurrentThread::t_threadName = "finished";
+    }
+    catch(const Exception& ex)
+    {
+        CurrentThread::t_threadName = "crashed";
+        cerr << "exception caught in Thread " << name_ << endl;
+        cerr << "reason: " << ex.what() << endl;
+        cerr << "stack trace: " << ex.stackTrace() << endl;
+
+        ::abort();
+    }
+    catch(const std::exception& ex)
+    {
+        CurrentThread::t_threadName = "crashed";
+        cerr << "exception caught in Thread " << name_ << endl;
+        cerr << "reason: " << ex.what() << endl;
+
+        ::abort();
+    }
+    catch(...)
+    {
+        CurrentThread::t_threadName = "crashed";
+        cerr << "exception caught in Thread " << name_ << endl;
+
+        throw;
     }
 }
-
-int Thread::join()
-{
-    joined_ = true;
-    return pthread_join(pthreadId_, NULL);
-}
-

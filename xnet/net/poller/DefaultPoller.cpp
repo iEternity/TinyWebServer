@@ -1,14 +1,14 @@
 //
 // Created by zhangkuo on 17-8-13.
 //
-#include "../Poller.h"
-#include "PollPoller.h"
-#include "EpollPoller.h"
+#include <xnet/net/Poller.h>
+#include <xnet/net/poller/PollPoller.h>
+#include <xnet/net/poller/EpollPoller.h>
 using namespace xnet;
 
 Poller* Poller::newDefaultPoller(EventLoop *loop)
 {
-    if(::getenv("WEBSERVER_USE_POLL"))
+    if(::getenv("XNET_USE_POLL"))
     {
         return new PollPoller(loop);
     }

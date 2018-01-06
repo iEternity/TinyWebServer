@@ -4,46 +4,67 @@
 
 #ifndef WEBSERVER_CURRENTTHREAD_H
 #define WEBSERVER_CURRENTTHREAD_H
+#include <string>
+#include <sys/syscall.h>
+#include <thread>
+#include <chrono>
+#include <unistd.h>
 
 namespace xnet
 {
 
 namespace CurrentThread
 {
-    extern __thread int t_cachedTid;
-    extern __thread char t_tidString[32];
-    extern __thread int t_tidStringLength;
-    extern __thread const char* t_threadName;
+    extern thread_local int t_cachedTid;
+    extern thread_local std::string t_tidString;
+    extern thread_local std::string t_threadName;
 
-    void cacheTid();
+    static pid_t gettid()
+    {
+        return static_cast<pid_t>(::syscall(SYS_gettid));
+    }
+
 
     inline int tid()
     {
         if (t_cachedTid == 0)
         {
-            cacheTid();
+            t_cachedTid = gettid();
+            t_tidString = std::to_string(t_cachedTid);
         }
         return t_cachedTid;
     }
 
-    inline const char* tidString()
+    inline const std::string& tidString()
     {
         return t_tidString;
     }
 
-    inline size_t tidStringLength()
-    {
-        return static_cast<size_t>(t_tidStringLength);
-    }
-
-    inline const char* name()
+    inline const std::string& name()
     {
         return t_threadName;
     }
 
-    bool isMainThread();
+    inline bool isMainThread()
+    {
+        return t_cachedTid == ::getpid();
+    }
 
-    void sleepUsec(int64_t usec);
+    inline void sleep(int64_t sec)
+    {
+        std::this_thread::sleep_for(std::chrono::seconds(sec));
+    }
+
+    inline void sleepMsec(int64_t msec)
+    {
+        std::this_thread::sleep_for(std::chrono::milliseconds(msec));
+    }
+
+    inline void sleepUsec(int64_t usec)
+    {
+        std::this_thread::sleep_for(std::chrono::microseconds(usec));
+    }
+
 }   //namespace CurrentThread
 
 }   //namespace xNet

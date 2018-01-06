@@ -1,22 +1,28 @@
 //
 // Created by zhangkuo on 17-8-6.
 //
-#include "EventLoop.h"
 #include <sys/eventfd.h>
-#include "Poller.h"
-#include "SocketOps.h"
-#include "TimerQueue.h"
+#include <assert.h>
+#include <xnet/net/EventLoop.h>
+#include <xnet/net/SocketOps.h>
+#include <xnet/net/TimerQueue.h>
+#include <xnet/net/Poller.h>
+#include <xnet/base/Logging.h>
 
 using namespace xnet;
 
 namespace
 {
-    __thread EventLoop* t_loopInThisThread = 0;
+    thread_local EventLoop* t_loopInThisThread = 0;
 
     int createEventFd()
     {
-        int evtFd = ::eventfd(0, EFD_CLOEXEC | EFD_NONBLOCK);
-        return evtFd;
+        int eventFd = ::eventfd(0, EFD_CLOEXEC | EFD_NONBLOCK);
+        if(eventFd < 0)
+        {
+            LOG_SYSFATAL << "Failed to create eventfd";
+        }
+        return eventFd;
     }
 
     const int kPollTimeMs = 10000;
@@ -52,6 +58,9 @@ EventLoop::~EventLoop()
 
 void EventLoop::loop()
 {
+    assert(!looping_);
+    assertInLoopThread();
+
     looping_ = true;
     quit_ = false;
 
@@ -59,6 +68,8 @@ void EventLoop::loop()
     {
         activeChannels_.clear();
         pollReturnTime_ = poller_->poll(kPollTimeMs, &activeChannels_);
+        iteration_++;
+
         eventHandling_ = true;
 
         for(auto& channel:activeChannels_)
@@ -113,7 +124,7 @@ void EventLoop::runInLoop(Functor&& cb)
 void EventLoop::queueInLoop(const Functor& cb)
 {
     {
-        MutexLock lock(mutex_);
+        MutexLockGuard lock(mutex_);
         pendingFunctors_.push_back(cb);
     }
 
@@ -126,7 +137,7 @@ void EventLoop::queueInLoop(const Functor& cb)
 void EventLoop::queueInLoop(Functor&& cb)
 {
     {
-        MutexLock lock(mutex_);
+        MutexLockGuard lock(mutex_);
         pendingFunctors_.push_back(std::move(cb));
     }
 
@@ -220,3 +231,17 @@ void EventLoop::doPendingFunctors()
     callingPendingFunctors_ = false;
 }
 
+void EventLoop::assertInLoopThread() const
+{
+    if(!isInLoopThread())
+    {
+        abortNotInLoopThread();
+    }
+}
+
+void EventLoop::abortNotInLoopThread() const
+{
+    LOG_FATAL << "EventLoop::abortNotInLoopThread - EventLoop " << this
+              << " was created in threadId_ = " << threadId_
+              << ", current thread id = " << CurrentThread::tid();
+}

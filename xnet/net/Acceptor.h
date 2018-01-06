@@ -28,20 +28,20 @@ public:
         newConnectionCallback_ = cb;
     }
 
-    bool listening() const { return listening_; }
-
     void listen();
+    bool listening() const { return listening_; }
 
 private:
     void handleRead();
 
 private:
-    EventLoop* loop_;
-    Socket acceptSocket_;
-    Channel acceptChannel_;
+    EventLoop*  loop_;
+    Socket      acceptSocket_;
+    Channel     acceptChannel_;
+    bool        listening_;
+    int         idleFd_;
+
     NewConnectionCallback newConnectionCallback_;
-    bool listening_;
-    int idleFd_;
 };
 
 }

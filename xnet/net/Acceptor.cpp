@@ -2,10 +2,12 @@
 // Created by zhangkuo on 17-9-16.
 //
 #include <fcntl.h>
+#include <assert.h>
 #include <xnet/net/Acceptor.h>
 #include <xnet/net/EventLoop.h>
 #include <xnet/net/InetAddress.h>
 #include <xnet/net/SocketOps.h>
+#include <xnet/base/Logging.h>
 
 using namespace xnet;
 
@@ -17,6 +19,7 @@ Acceptor::Acceptor(EventLoop* loop, const InetAddress& listenAddr, bool reusePor
     idleFd_(::open("/dev/null", O_RDONLY | O_CLOEXEC))
 {
     assert(idleFd_ >= 0);
+
     acceptSocket_.setReuseAddr(true);
     acceptSocket_.setReusePort(reusePort);
     acceptSocket_.bindAddress(listenAddr);
@@ -32,6 +35,8 @@ Acceptor::~Acceptor()
 
 void Acceptor::listen()
 {
+    loop_->assertInLoopThread();
+
     listening_ = true;
     acceptSocket_.listen();
     acceptChannel_.enableReading();
@@ -39,6 +44,8 @@ void Acceptor::listen()
 
 void Acceptor::handleRead()
 {
+    loop_->assertInLoopThread();
+
     InetAddress peerAddress;
     int connfd = acceptSocket_.accept(&peerAddress);
     if(connfd >= 0)
@@ -54,6 +61,8 @@ void Acceptor::handleRead()
     }
     else
     {
+        LOG_SYSERR << "in Acceptor::handleRead";
+
         if(errno == EMFILE)
         {
             ::close(idleFd_);

@@ -5,15 +5,15 @@
 #ifndef WEBSERVER_EVENTLOOP_H
 #define WEBSERVER_EVENTLOOP_H
 
-#include <boost/noncopyable.hpp>
-#include "Channel.h"
-#include "boost/scoped_ptr.hpp"
-#include "Poller.h"
-#include "../base/Timestamp.h"
-#include "../base/Mutex.h"
-#include "../base/CurrentThread.h"
-#include "Timer.h"
-#include "TimerId.h"
+#include <mutex>
+#include <vector>
+#include <boost/any.hpp>
+#include <xnet/base/noncopyable.h>
+#include <xnet/net/Channel.h>
+#include <xnet/base/Timestamp.h>
+#include <xnet/base/CurrentThread.h>
+#include <xnet/net/Timer.h>
+#include <xnet/net/TimerId.h>
 
 namespace xnet
 {
@@ -25,7 +25,10 @@ class EventLoop : boost::noncopyable
 {
 public:
     using Functor = std::function<void()>;
+    using ChannelList = std::vector<Channel*>;
+    using MutexLockGuard = std::lock_guard<std::mutex>;
 
+public:
     EventLoop();
     ~EventLoop();
 
@@ -53,31 +56,42 @@ public:
     void cancel(TimerId timerId);
 
     bool isInLoopThread() const { return threadId_ == CurrentThread::tid(); }
+    void assertInLoopThread() const;
 
+    bool isEventHandling() const { return eventHandling_; }
+
+    int64_t getIteration() const { return iteration_; }
+
+    Timestamp getPollReturnTime() const { return pollReturnTime_; }
 
 private:
     void handleRead();
     void doPendingFunctors();
 
-    using ChannelList = std::vector<Channel*>;
+    void abortNotInLoopThread() const;
 
+private:
     bool looping_;
     bool quit_;
     bool eventHandling_;
     bool callingPendingFunctors_;
-    int64_t iteration_;
+
+    int64_t     iteration_;
     const pid_t threadId_;
-    Timestamp pollReturnTime_;
-    boost::scoped_ptr<Poller> poller_;
-    boost::scoped_ptr<TimerQueue> timerQueue_;
+    Timestamp   pollReturnTime_;
+    std::unique_ptr<Poller> poller_;
+    std::unique_ptr<TimerQueue> timerQueue_;
+
     int wakeupFd_;
-    boost::scoped_ptr<Channel> wakeupChannel_;
+    std::unique_ptr<Channel> wakeupChannel_;
 
     ChannelList activeChannels_;
     Channel* currentActiveChannel_;
 
-    MutexLock mutex_;
+    std::mutex mutex_;
     std::vector<Functor> pendingFunctors_;
+
+    boost::any context_;
 };
 
 }

@@ -63,7 +63,7 @@ Logger::Logger(const SourceFile& file, int line, LogLevel level):
     formatTime();
 
     CurrentThread::tid();
-    stream_ << StringPiece(CurrentThread::tidString(), CurrentThread::tidStringLength());
+    stream_ << CurrentThread::tidString();
 
     stream_ << StringPiece(LogLevelName[level]);
 
@@ -80,7 +80,7 @@ Logger::Logger(const SourceFile& file, int line, LogLevel level, const char* fun
     formatTime();
 
     CurrentThread::tid();
-    stream_ << StringPiece(CurrentThread::tidString(), CurrentThread::tidStringLength());
+    stream_ << CurrentThread::tidString();
 
     stream_ << StringPiece(LogLevelName[level]);
 
@@ -99,7 +99,7 @@ Logger::Logger(const SourceFile& file, int line, bool isAbort):
     formatTime();
 
     CurrentThread::tid();
-    stream_ << StringPiece(CurrentThread::tidString(), CurrentThread::tidStringLength());
+    stream_ << CurrentThread::tidString();
 
     stream_ << StringPiece(LogLevelName[level_]);
 

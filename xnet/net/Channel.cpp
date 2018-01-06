@@ -1,8 +1,10 @@
 //
 // Created by zhangkuo on 17-8-7.
 //
+#include <sstream>
 #include <poll.h>
 #include <xnet/net/Channel.h>
+#include <xnet/base/Logging.h>
 using namespace xnet;
 
 const int Channel::kNoneEvent = 0;
@@ -43,19 +45,27 @@ void Channel::handleEvent(Timestamp receiveTime)
 
 void Channel::handleEventWithGuard(Timestamp receiveTime)
 {
-    if((revents_ & POLLHUP) !(revents_ & POLLIN))
+    LOG_TRACE << reventsToString();
+
+    if((revents_ & POLLHUP) && !(revents_ & POLLIN))
     {
+        LOG_WARN << "fd = " << fd_ << "Channel::handleEvent() POLLHUP";
         if(closeCallback_) closeCallback_();
     }
 
     if(revents_ & (POLLERR | POLLNVAL))
     {
+        if(revents_ & POLLNVAL)
+        {
+            LOG_WARN << "fd = " << fd_ << "Channel::handleEvent() POLLNVAL";
+        }
+
         if(errorCallback_) errorCallback_();
     }
 
     if(revents_ & (POLLIN | POLLPRI | POLLRDHUP))
     {
-        if(readCallback_) readCallback_();
+        if(readCallback_) readCallback_(receiveTime);
     }
 
     if(revents_ & POLLOUT)
@@ -73,14 +83,42 @@ void Channel::tie(const std::shared_ptr<void>& obj)
 
 void Channel::update()
 {
-    addedToLoop_ = true;
     loop_->updateChannel(this);
 }
 
 void Channel::remove()
 {
-    addedToLoop_ = false;
     loop_->removeChannel(this);
 }
 
+std::string Channel::eventsToString() const
+{
+    return eventsToString(fd_, events_);
+}
 
+std::string Channel::reventsToString() const
+{
+    return eventsToString(fd_, revents_);
+}
+
+std::string Channel::eventsToString(int fd, int event) const
+{
+    std::ostringstream oss;
+    oss << fd << ": ";
+
+    if(event & POLLIN) oss << "IN ";
+
+    if(event & POLLOUT) oss << "OUT ";
+
+    if(event & POLLHUP) oss << "HUP ";
+
+    if(event & POLLRDHUP) oss << "RDHUP ";
+
+    if(event & POLLPRI) oss << "PRI ";
+
+    if(event & POLLERR) oss << "ERR ";
+
+    if(event & POLLNVAL) oss << "NVAL ";
+
+    return oss.str();
+}
