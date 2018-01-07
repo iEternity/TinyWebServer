@@ -2,14 +2,13 @@
 // Created by zhangkuo on 17-8-9.
 //
 
-#ifndef WEBSERVER_POLLER_H
-#define WEBSERVER_POLLER_H
+#pragma once
 #include <boost/noncopyable.hpp>
 #include <vector>
 #include <map>
-#include "Channel.h"
-#include "EventLoop.h"
-#include "../base/Timestamp.h"
+#include <xnet/net/Channel.h>
+#include <xnet/net/EventLoop.h>
+#include <xnet/base/Timestamp.h>
 
 namespace xnet
 {
@@ -21,7 +20,9 @@ class Poller : boost::noncopyable
 {
 public:
     using ChannelList = std::vector<Channel*>;
+    using ChannelMap  = std::map<int, Channel*>;
 
+public:
     Poller(EventLoop* loop);
     virtual ~Poller();
 
@@ -36,7 +37,6 @@ public:
     static Poller* newDefaultPoller(EventLoop* loop);
 
 protected:
-    using ChannelMap = std::map<int, Channel*>;
     ChannelMap channels_;
 
 private:
@@ -44,5 +44,3 @@ private:
 };
 
 }
-
-#endif //WEBSERVER_POLLER_H

@@ -1,11 +1,12 @@
 //
 // Created by zhangkuo on 17-8-9.
 //
-#include "PollPoller.h"
+#include <xnet/net/poller/PollPoller.h>
+#include <xnet/base/Logging.h>
 using namespace xnet;
 
 PollPoller::PollPoller(EventLoop* loop)
-        : Poller(loop)
+    : Poller(loop)
 {
 
 }
@@ -22,11 +23,20 @@ Timestamp PollPoller::poll(int timeoutMS, ChannelList* activeChannels)
     Timestamp now(Timestamp::now());
     if(numEvents > 0)
     {
+        LOG_TRACE << numEvents << "events happened";
         fillActiveChannels(numEvents, activeChannels);
     }
     else if(numEvents == 0)
     {
-        /* nothing happended */
+        LOG_TRACE << "nothing happened";
+    }
+    else
+    {
+        if(savedErrno == EINTR)
+        {
+            errno = savedErrno;
+            LOG_SYSERR << "PollPoller::poll";
+        }
     }
 
     return now;
@@ -39,7 +49,7 @@ void PollPoller::fillActiveChannels(int numEvents, ChannelList* activeChannels) 
         if(it->revents > 0)
         {
             numEvents --;
-            ChannelMap::const_iterator ch = channels_.find(it->fd);
+            auto ch = channels_.find(it->fd);
             Channel* channel = ch->second;
             channel->setRevents(it->revents);
             activeChannels->push_back(channel);

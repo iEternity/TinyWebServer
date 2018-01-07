@@ -2,11 +2,10 @@
 // Created by zhangkuo on 17-8-9.
 //
 
-#ifndef WEBSERVER_POLLPOLLER_H
-#define WEBSERVER_POLLPOLLER_H
+#pragma once
 
-#include "../Poller.h"
-#include "poll.h"
+#include <poll.h>
+#include <xnet/net/Poller.h>
 
 namespace xnet
 {
@@ -24,11 +23,9 @@ public:
 private:
     void fillActiveChannels(int numEvents, ChannelList* activeChannels) const;
 
-    using PollFdList = std::vector<struct pollfd>;
-    PollFdList pollfds_;
+private:
+    std::vector<struct pollfd> pollfds_;
 };
 
 }
 
-
-#endif //WEBSERVER_POLLPOLLER_H
