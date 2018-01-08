@@ -2,8 +2,8 @@
 // Created by zhangkuo on 17-8-6.
 //
 
-#ifndef WEBSERVER_EVENTLOOP_H
-#define WEBSERVER_EVENTLOOP_H
+#ifndef XNET_EVENTLOOP_H
+#define XNET_EVENTLOOP_H
 
 #include <mutex>
 #include <vector>
@@ -96,4 +96,4 @@ private:
 
 }
 
-#endif //WEBSERVER_EVENTLOOP_H
+#endif //XNET_EVENTLOOP_H

@@ -2,11 +2,10 @@
 // Created by zhangkuo on 17-8-12.
 //
 
-#ifndef WEBSERVER_EPOLLPOLLER_H
-#define WEBSERVER_EPOLLPOLLER_H
-#include "../Poller.h"
+#pragma once
 #include <sys/epoll.h>
 #include <vector>
+#include <xnet/net/Poller.h>
 
 namespace xnet
 {
@@ -28,12 +27,9 @@ private:
 
     void update(int operation, Channel* channel);
 
-    using EventList = std::vector<struct epoll_event>;
-
+private:
     int epollfd_;
-    EventList events_;
+    std::vector<struct epoll_event> events_;
 };
 
 }
-
-#endif //WEBSERVER_EPOLLPOLLER_H

@@ -36,6 +36,11 @@ public:
 
     static Poller* newDefaultPoller(EventLoop* loop);
 
+    void assertInLoopThread() const
+    {
+        ownerLoop_->assertInLoopThread();
+    }
+
 protected:
     ChannelMap channels_;
 

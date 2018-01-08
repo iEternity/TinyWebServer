@@ -1,11 +1,10 @@
 //
 // Created by zhangkuo on 17-8-13.
 //
-#include "EpollPoller.h"
-#include <string.h>
-#include <boost/implicit_cast.hpp>
+#include <xnet/net/poller/EpollPoller.h>
+#include <xnet/base/Logging.h>
+
 using namespace xnet;
-using namespace boost;
 
 namespace
 {
@@ -21,7 +20,7 @@ EpollPoller::EpollPoller(EventLoop* loop)
 {
     if (epollfd_ < 0)
     {
-        //LOG_SYSFATAL
+        LOG_SYSFATAL << "EpollPoller::EpollPoller";
     }
 }
 
@@ -32,18 +31,36 @@ EpollPoller::~EpollPoller()
 
 Timestamp EpollPoller::poll(int timeoutMs, ChannelList* activeChannels)
 {
+    LOG_TRACE << "fd totoal count: " << channels_.size();
+
     int numEvents = ::epoll_wait(epollfd_,
                                  &*events_.begin(),
                                  static_cast<int>(events_.size()),
                                  timeoutMs);
+
+    int savedErrno = errno;
     Timestamp now(Timestamp::now());
 
     if(numEvents > 0)
     {
+        LOG_TRACE << numEvents << " events happened";
+
         fillActiveChannels(numEvents, activeChannels);
-        if(implicit_cast<size_t>(numEvents) == events_.size())
+        if(static_cast<size_t>(numEvents) == events_.size())
         {
             events_.resize(events_.size() * 2);
+        }
+    }
+    else if(numEvents == 0)
+    {
+        LOG_TRACE << "nothing happened";
+    }
+    else
+    {
+        if(savedErrno != EINTR)
+        {
+            errno = savedErrno;
+            LOG_SYSERR << "EpollPoller::poll";
         }
     }
 
