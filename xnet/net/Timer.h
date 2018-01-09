@@ -2,8 +2,8 @@
 // Created by zhangkuo on 17-8-23.
 //
 
-#ifndef WEBSERVER_TIMER_H
-#define WEBSERVER_TIMER_H
+#ifndef XNET_TIMER_H
+#define XNET_TIMER_H
 #include <boost/noncopyable.hpp>
 #include "../base/Timestamp.h"
 #include "Callbacks.h"
@@ -57,4 +57,4 @@ private:
 
 }
 
-#endif //WEBSERVER_TIMER_H
+#endif //XNET_TIMER_H

@@ -2,8 +2,8 @@
 // Created by zhangkuo on 17-7-30.
 // This is internal header file ,you should not include this
 
-#ifndef WEBSERVER_SOCKETOPS_H
-#define WEBSERVER_SOCKETOPS_H
+#ifndef XNET_SOCKETOPS_H
+#define XNET_SOCKETOPS_H
 
 #include <arpa/inet.h>
 #include <netinet/tcp.h>
@@ -51,4 +51,4 @@ bool                isSelfConnect(int sockfd);
 }
 }
 
-#endif //WEBSERVER_SOCKETOPS_H
+#endif //XNET_SOCKETOPS_H

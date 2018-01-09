@@ -2,8 +2,8 @@
 // Created by zhangkuo on 17-9-17.
 //
 
-#ifndef WEBSERVER_TCPCONNECTION_H
-#define WEBSERVER_TCPCONNECTION_H
+#ifndef XNET_TCPCONNECTION_H
+#define XNET_TCPCONNECTION_H
 
 #include <boost/noncopyable.hpp>
 #include <memory>
@@ -144,4 +144,4 @@ private:
 
 }
 
-#endif //WEBSERVER_TCPCONNECTION_H
+#endif //XNET_TCPCONNECTION_H

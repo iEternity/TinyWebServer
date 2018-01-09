@@ -2,8 +2,8 @@
 // Created by zhangkuo on 17-9-16.
 //
 
-#ifndef WEBSERVER_ACCEPTOR_H
-#define WEBSERVER_ACCEPTOR_H
+#ifndef XNET_ACCEPTOR_H
+#define XNET_ACCEPTOR_H
 
 #include <xnet/base/noncopyable.h>
 #include <xnet/net/Socket.h>
@@ -46,4 +46,4 @@ private:
 
 }
 
-#endif //WEBSERVER_ACCEPTOR_H
+#endif //XNET_ACCEPTOR_H

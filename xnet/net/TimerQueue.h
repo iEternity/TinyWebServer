@@ -2,8 +2,8 @@
 // Created by zhangkuo on 17-8-24.
 //
 
-#ifndef WEBSERVER_TIMERQUEUE_H
-#define WEBSERVER_TIMERQUEUE_H
+#ifndef XNET_TIMERQUEUE_H
+#define XNET_TIMERQUEUE_H
 #include <boost/noncopyable.hpp>
 #include <set>
 #include "EventLoop.h"
@@ -57,4 +57,4 @@ private:
 
 }
 
-#endif //WEBSERVER_TIMERQUEUE_H
+#endif //XNET_TIMERQUEUE_H

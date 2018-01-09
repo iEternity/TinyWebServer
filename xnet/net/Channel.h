@@ -2,8 +2,8 @@
 // Created by zhangkuo on 17-8-7.
 //
 
-#ifndef WEBSERVER_CHANNEL_H
-#define WEBSERVER_CHANNEL_H
+#ifndef XNET_CHANNEL_H
+#define XNET_CHANNEL_H
 
 #include <functional>
 #include <memory>
@@ -94,4 +94,4 @@ private:
 };
 
 }
-#endif //WEBSERVER_CHANNEL_H
+#endif //XNET_CHANNEL_H

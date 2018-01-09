@@ -2,8 +2,8 @@
 // Created by zhangkuo on 17-7-28.
 //
 
-#ifndef WEBSERVER_SOCKET_H
-#define WEBSERVER_SOCKET_H
+#ifndef XNET_SOCKET_H
+#define XNET_SOCKET_H
 
 #include <boost/noncopyable.hpp>
 #include "InetAddress.h"
@@ -40,4 +40,4 @@ private:
 
 }
 
-#endif //WEBSERVER_SOCKET_H
+#endif //XNET_SOCKET_H

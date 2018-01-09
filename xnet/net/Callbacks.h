@@ -2,8 +2,8 @@
 // Created by zhangkuo on 17-8-23.
 //
 
-#ifndef WEBSERVER_CALLBACKS_H
-#define WEBSERVER_CALLBACKS_H
+#ifndef XNET_CALLBACKS_H
+#define XNET_CALLBACKS_H
 
 #include <functional>
 #include <memory>
@@ -32,4 +32,4 @@ void defaultMessageCallback(const TcpConnectionPtr& conn, Buffer* buffer, Timest
 
 }
 
-#endif //WEBSERVER_CALLBACKS_H
+#endif //XNET_CALLBACKS_H

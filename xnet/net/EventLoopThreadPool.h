@@ -2,8 +2,8 @@
 // Created by zhangkuo on 17-9-14.
 //
 
-#ifndef WEBSERVER_EVENTLOOPTHREADPOOL_H
-#define WEBSERVER_EVENTLOOPTHREADPOOL_H
+#ifndef XNET_EVENTLOOPTHREADPOOL_H
+#define XNET_EVENTLOOPTHREADPOOL_H
 
 
 #include <boost/noncopyable.hpp>
@@ -49,4 +49,4 @@ private:
 
 }
 
-#endif //WEBSERVER_EVENTLOOPTHREADPOOL_H
+#endif //XNET_EVENTLOOPTHREADPOOL_H

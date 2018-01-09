@@ -2,8 +2,8 @@
 // Created by zhangkuo on 17-8-18.
 //
 
-#ifndef WEBSERVER_MUTEX_H
-#define WEBSERVER_MUTEX_H
+#ifndef XNET_MUTEX_H
+#define XNET_MUTEX_H
 #include <boost/noncopyable.hpp>
 #include <pthread.h>
 #include "CurrentThread.h"
@@ -102,4 +102,4 @@ private:
 }
 
 #define MutexLockGuard(x) error "Missing guard object name"
-#endif //WEBSERVER_MUTEX_H
+#endif //XNET_MUTEX_H

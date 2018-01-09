@@ -2,8 +2,8 @@
 // Created by zhangkuo on 17-8-19.
 //
 
-#ifndef WEBSERVER_ATOMIC_H
-#define WEBSERVER_ATOMIC_H
+#ifndef XNET_ATOMIC_H
+#define XNET_ATOMIC_H
 #include <boost/noncopyable.hpp>
 #include <atomic>
 
@@ -77,4 +77,4 @@ private:
 
 }   //namespace xNet
 
-#endif //WEBSERVER_ATOMIC_H
+#endif //XNET_ATOMIC_H

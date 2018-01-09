@@ -2,8 +2,8 @@
 // Created by zhangkuo on 17-8-20.
 //
 
-#ifndef WEBSERVER_CURRENTTHREAD_H
-#define WEBSERVER_CURRENTTHREAD_H
+#ifndef XNET_CURRENTTHREAD_H
+#define XNET_CURRENTTHREAD_H
 #include <string>
 #include <sys/syscall.h>
 #include <thread>
@@ -69,4 +69,4 @@ namespace CurrentThread
 
 }   //namespace xNet
 
-#endif //WEBSERVER_CURRENTTHREAD_H
+#endif //XNET_CURRENTTHREAD_H

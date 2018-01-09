@@ -2,8 +2,8 @@
 // Created by zhangkuo on 17-9-16.
 //
 
-#ifndef WEBSERVER_STRINGPIECE_H
-#define WEBSERVER_STRINGPIECE_H
+#ifndef XNET_STRINGPIECE_H
+#define XNET_STRINGPIECE_H
 #include <string>
 #include <cstring>
 #include <iostream>
@@ -134,4 +134,4 @@ std::ostream& operator<< (std::ostream& o,  const StringPiece& str);
 
 }
 
-#endif //WEBSERVER_STRINGPIECE_H
+#endif //XNET_STRINGPIECE_H

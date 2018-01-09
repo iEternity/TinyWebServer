@@ -2,8 +2,8 @@
 // Created by zhangkuo on 17-8-24.
 //
 
-#ifndef WEBSERVER_TIMERID_H
-#define WEBSERVER_TIMERID_H
+#ifndef XNET_TIMERID_H
+#define XNET_TIMERID_H
 #include "Timer.h"
 
 namespace xnet
@@ -36,4 +36,4 @@ private:
 
 }
 
-#endif //WEBSERVER_TIMERID_H
+#endif //XNET_TIMERID_H

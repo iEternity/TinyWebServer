@@ -2,8 +2,8 @@
 // Created by zhangkuo on 17-7-28.
 //
 
-#ifndef WEBSERVER_ENDIAN_H
-#define WEBSERVER_ENDIAN_H
+#ifndef XNET_ENDIAN_H
+#define XNET_ENDIAN_H
 
 #include <endian.h>
 #include <stdint.h>
@@ -41,4 +41,4 @@ namespace sockets
 }   //sockets
 }   //xNet
 
-#endif //WEBSERVER_ENDIAN_H
+#endif //XNET_ENDIAN_H

@@ -2,8 +2,8 @@
 // Created by zhangkuo on 17-8-18.
 //
 
-#ifndef WEBSERVER_THREAD_H
-#define WEBSERVER_THREAD_H
+#ifndef XNET_THREAD_H
+#define XNET_THREAD_H
 
 #include <thread>
 #include <functional>
@@ -54,4 +54,4 @@ private:
 
 }
 
-#endif //WEBSERVER_THREAD_H
+#endif //XNET_THREAD_H

@@ -2,8 +2,8 @@
 // Created by zhangkuo on 17-9-24.
 //
 
-#ifndef WEBSERVER_CONNECTOR_H
-#define WEBSERVER_CONNECTOR_H
+#ifndef XNET_CONNECTOR_H
+#define XNET_CONNECTOR_H
 
 #include <memory>
 #include "InetAddress.h"
@@ -60,4 +60,4 @@ private:
 
 }
 
-#endif //WEBSERVER_CONNECTOR_H
+#endif //XNET_CONNECTOR_H

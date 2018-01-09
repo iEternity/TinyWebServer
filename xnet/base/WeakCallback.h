@@ -2,8 +2,8 @@
 // Created by zhangkuo on 17-9-22.
 //
 
-#ifndef WEBSERVER_WEAKCALLBACK_H
-#define WEBSERVER_WEAKCALLBACK_H
+#ifndef XNET_WEAKCALLBACK_H
+#define XNET_WEAKCALLBACK_H
 
 #include <memory>
 #include <functional>
@@ -54,4 +54,4 @@ void makeWeakCallback(const std::shared_ptr<CLASS>& object, void(CLASS::*functio
 
 }
 
-#endif //WEBSERVER_WEAKCALLBACK_H
+#endif //XNET_WEAKCALLBACK_H

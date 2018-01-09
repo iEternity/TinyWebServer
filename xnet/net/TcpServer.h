@@ -2,8 +2,8 @@
 // Created by zhangkuo on 17-9-12.
 //
 
-#ifndef WEBSERVER_TCPSERVER_H
-#define WEBSERVER_TCPSERVER_H
+#ifndef XNET_TCPSERVER_H
+#define XNET_TCPSERVER_H
 #include <functional>
 #include <map>
 #include <atomic>
@@ -74,4 +74,4 @@ private:
 
 }
 
-#endif //WEBSERVER_TCPSERVER_H
+#endif //XNET_TCPSERVER_H

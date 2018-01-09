@@ -2,8 +2,8 @@
 // Created by zhangkuo on 17-9-27.
 //
 
-#ifndef WEBSERVER_LOGGING_H
-#define WEBSERVER_LOGGING_H
+#ifndef XNET_LOGGING_H
+#define XNET_LOGGING_H
 #include <string.h>
 #include "LogStream.h"
 #include "Timestamp.h"
@@ -102,4 +102,4 @@ inline Logger::LogLevel Logger::logLevel()
 
 }
 
-#endif //WEBSERVER_LOGGING_H
+#endif //XNET_LOGGING_H

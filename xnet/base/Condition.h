@@ -2,8 +2,8 @@
 // Created by zhangkuo on 17-9-13.
 //
 
-#ifndef WEBSERVER_CONDITION_H
-#define WEBSERVER_CONDITION_H
+#ifndef XNET_CONDITION_H
+#define XNET_CONDITION_H
 
 #include <boost/noncopyable.hpp>
 #include "Mutex.h"
@@ -51,4 +51,4 @@ private:
 
 }
 
-#endif //WEBSERVER_CONDITION_H
+#endif //XNET_CONDITION_H

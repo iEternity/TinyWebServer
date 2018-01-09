@@ -2,8 +2,8 @@
 // Created by zhangkuo on 17-9-13.
 //
 
-#ifndef WEBSERVER_EVENTLOOPTHREAD_H
-#define WEBSERVER_EVENTLOOPTHREAD_H
+#ifndef XNET_EVENTLOOPTHREAD_H
+#define XNET_EVENTLOOPTHREAD_H
 
 #include <boost/noncopyable.hpp>
 #include "../base/Thread.h"
@@ -37,4 +37,4 @@ private:
 
 }
 
-#endif //WEBSERVER_EVENTLOOPTHREAD_H
+#endif //XNET_EVENTLOOPTHREAD_H

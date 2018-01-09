@@ -2,8 +2,8 @@
 // Created by zhangkuo on 17-8-7.
 //
 
-#ifndef WEBSERVER_TIMESTAMP_H
-#define WEBSERVER_TIMESTAMP_H
+#ifndef XNET_TIMESTAMP_H
+#define XNET_TIMESTAMP_H
 
 #include <boost/operators.hpp>
 #include <string>
@@ -83,4 +83,4 @@ inline Timestamp addTime(const Timestamp& timestamp, double seconds)
 }
 
 }
-#endif //WEBSERVER_TIMESTAMP_H
+#endif //XNET_TIMESTAMP_H

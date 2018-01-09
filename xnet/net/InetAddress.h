@@ -2,8 +2,8 @@
 // Created by zhangkuo on 17-7-28.
 //
 
-#ifndef WEBSERVER_INETADDRESS_H
-#define WEBSERVER_INETADDRESS_H
+#ifndef XNET_INETADDRESS_H
+#define XNET_INETADDRESS_H
 
 #include <arpa/inet.h>
 #include <string>
@@ -50,4 +50,4 @@ private:
 
 }
 
-#endif //WEBSERVER_INETADDRESS_H
+#endif //XNET_INETADDRESS_H

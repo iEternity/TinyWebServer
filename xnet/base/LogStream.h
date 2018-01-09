@@ -2,8 +2,8 @@
 // Created by zhangkuo on 17-9-27.
 //
 
-#ifndef WEBSERVER_LOGSTREAM_H
-#define WEBSERVER_LOGSTREAM_H
+#ifndef XNET_LOGSTREAM_H
+#define XNET_LOGSTREAM_H
 #include <stdio.h>
 #include <string>
 #include <functional>
@@ -157,4 +157,4 @@ private:
 
 }
 
-#endif //WEBSERVER_LOGSTREAM_H
+#endif //XNET_LOGSTREAM_H

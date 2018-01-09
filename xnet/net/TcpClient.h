@@ -2,8 +2,8 @@
 // Created by zhangkuo on 17-9-24.
 //
 
-#ifndef WEBSERVER_TCPCLIENT_H
-#define WEBSERVER_TCPCLIENT_H
+#ifndef XNET_TCPCLIENT_H
+#define XNET_TCPCLIENT_H
 #include "InetAddress.h"
 #include "TcpConnection.h"
 #include "../base/Mutex.h"
@@ -53,4 +53,4 @@ private:
 
 }
 
-#endif //WEBSERVER_TCPCLIENT_H
+#endif //XNET_TCPCLIENT_H

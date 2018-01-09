@@ -2,8 +2,8 @@
 // Created by zhangkuo on 17-9-16.
 //
 
-#ifndef WEBSERVER_BUFFER_H
-#define WEBSERVER_BUFFER_H
+#ifndef XNET_BUFFER_H
+#define XNET_BUFFER_H
 
 #include <vector>
 #include <stdio.h>
@@ -352,4 +352,4 @@ private:
 
 }
 
-#endif //WEBSERVER_BUFFER_H
+#endif //XNET_BUFFER_H
