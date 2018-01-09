@@ -1,9 +1,9 @@
 //
 // Created by zhangkuo on 17-8-25.
 //
+#include <sys/timerfd.h>
 #include <string.h>
-#include "TimerQueue.h"
-#include "sys/timerfd.h"
+#include <xnet/net/TimerQueue.h>
 
 namespace xnet
 {
@@ -68,11 +68,6 @@ TimerQueue::~TimerQueue()
     timerfdChannel_.disableAll();
     timerfdChannel_.remove();
     ::close(timerfd_);
-
-//    for(auto it:timers_)
-//    {
-//        delete it.second;
-//    }
 }
 
 TimerId TimerQueue::addTimer(const TimerCallback& cb, Timestamp when, double interval)

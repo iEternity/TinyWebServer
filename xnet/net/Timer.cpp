@@ -1,10 +1,10 @@
 //
 // Created by zhangkuo on 17-8-23.
 //
-#include "Timer.h"
+#include <xnet/net/Timer.h>
 using namespace xnet;
 
-AtomicInt64 Timer::s_numCreated_;
+std::atomic<int64_t> Timer::s_numCreated_;
 
 void Timer::restart(Timestamp now)
 {

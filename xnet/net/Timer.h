@@ -4,15 +4,15 @@
 
 #ifndef XNET_TIMER_H
 #define XNET_TIMER_H
-#include <boost/noncopyable.hpp>
-#include "../base/Timestamp.h"
-#include "Callbacks.h"
-#include "../base/Atomic.h"
+#include <atomic>
+#include <xnet/base/noncopyable.h>
+#include <xnet/base/Timestamp.h>
+#include <xnet/base/Callbacks.h>
 
 namespace xnet
 {
 
-class Timer : boost::noncopyable
+class Timer :noncopyable
 {
 public:
     Timer(const TimerCallback& cb, Timestamp when, double interval)
@@ -20,7 +20,7 @@ public:
           expiration_(when),
           interval_(interval),
           repeat_(interval > 0.0),
-          sequence_(s_numCreated_.incrementAndGet())
+          sequence_(++s_numCreated_)
     {
     }
 
@@ -29,7 +29,7 @@ public:
           expiration_(when),
           interval_(interval),
           repeat_(interval > 0.0),
-          sequence_(s_numCreated_.incrementAndGet())
+          sequence_(++s_numCreated_)
     {
     }
 
@@ -43,16 +43,16 @@ public:
 
     void restart(Timestamp now);
 
-    static int64_t numCreated() { return s_numCreated_.get(); }
+    static int64_t numCreated() { return s_numCreated_; }
 
 private:
     const TimerCallback callback_;
-    Timestamp expiration_;
-    const double interval_;
-    const bool repeat_;
-    const int64_t sequence_;
+    Timestamp           expiration_;
+    const bool          repeat_;
+    const double        interval_;
+    const int64_t       sequence_;
 
-    static AtomicInt64 s_numCreated_;
+    static std::atomic<int64_t> s_numCreated_;
 };
 
 }

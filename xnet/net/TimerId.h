@@ -4,7 +4,6 @@
 
 #ifndef XNET_TIMERID_H
 #define XNET_TIMERID_H
-#include "Timer.h"
 
 namespace xnet
 {
@@ -15,6 +14,7 @@ class TimerId
 public:
     using TimerPtr = std::shared_ptr<Timer>;
 
+public:
     TimerId()
         : timer_(nullptr),
           sequence_(0)
