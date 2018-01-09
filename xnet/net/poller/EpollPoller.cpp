@@ -79,6 +79,10 @@ void EpollPoller::fillActiveChannels(int numEvents, ChannelList* activeChannels)
 
 void EpollPoller::updateChannel(Channel* channel)
 {
+    Poller::assertInLoopThread();
+    LOG_TRACE << "fd = " << channel->fd() << " events = {" << channel->eventsToString() <<"}"
+              << " index = " << channel->index();
+
     int idx = channel->index();
     if(idx == kNew)
     {
@@ -110,6 +114,9 @@ void EpollPoller::updateChannel(Channel* channel)
 
 void EpollPoller::removeChannel(Channel* channel)
 {
+    Poller::assertInLoopThread();
+    LOG_TRACE << "fd = " << channel->fd();
+
     channels_.erase(channel->fd());
     if(channel->index() == kAdded)
     {
@@ -124,6 +131,35 @@ void EpollPoller::update(int operation, Channel* channel)
     memset(&event, 0, sizeof event);
     event.events = channel->events();
     event.data.ptr = channel;
+    int fd = channel->fd();
 
-    ::epoll_ctl(epollfd_, operation, channel->fd(), &event);
+    LOG_TRACE << "epoll_ctl operation = " << operationToString(operation)
+              << " fd = " << fd << " events = {" << channel->eventsToString() << "}"
+
+    if(::epoll_ctl(epollfd_, operation, fd, &event) < 0)
+    {
+        if(operation == kDeleted)
+        {
+            LOG_SYSERR << "epoll_ctrl operation = " << operationToString(operation) << " fd = " << fd;
+        }
+        else
+        {
+            LOG_SYSFATAL << "epoll_ctl operation = " << operationToString(operation) << " fd = " << fd;
+        }
+    }
+}
+
+const char* EpollPoller::operationToString(int operation)
+{
+    switch(operation)
+    {
+    case kAdded:
+        return "Added";
+    case kNew:
+        return "New";
+    case kDeleted:
+        return "Deleted";
+    default:
+        return "Unknown Operation";
+    }
 }

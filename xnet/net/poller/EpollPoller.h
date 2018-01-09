@@ -27,6 +27,8 @@ private:
 
     void update(int operation, Channel* channel);
 
+    static const char* operationToString(int operation);
+
 private:
     int epollfd_;
     std::vector<struct epoll_event> events_;
