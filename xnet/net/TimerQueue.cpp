@@ -125,7 +125,7 @@ void TimerQueue::handleRead()
     callingExpiredTimers_ = true;
     cancelingTimers_.clear();
 
-    for(auto entry:expired)
+    for(auto& entry : expired)
     {
         entry.second->run();
     }
@@ -138,14 +138,15 @@ std::vector<TimerQueue::Entry> TimerQueue::getExpired(Timestamp now)
 {
     std::vector<Entry> expired;
     //Entry sentry(now, reinterpret_cast<Timer*>(UINTPTR_MAX));
-    Entry sentry(now, TimerPtr(reinterpret_cast<Timer*>(UINTPTR_MAX)));
+    Entry sentry(now, TimerPtr());
     auto end = timers_.lower_bound(sentry);
     std::copy(timers_.begin(), end, back_inserter(expired));
     timers_.erase(timers_.begin(), end);
 
-    for(auto entry:expired)
+    for(auto& entry:expired)
     {
         ActiveTimer timer(entry.second, entry.second->sequence());
+        activeTimers_.erase(timer);
     }
 
     return expired;
@@ -186,7 +187,7 @@ bool TimerQueue::insert(TimerPtr timer)
 {
     bool earliestChanged = false;
     Timestamp when = timer->expiration();
-    TimerList::iterator it = timers_.begin();
+    auto it = timers_.begin();
     if(it == timers_.end() || when < it->first)
     {
         earliestChanged = true;
