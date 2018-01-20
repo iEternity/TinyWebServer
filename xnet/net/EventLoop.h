@@ -9,11 +9,12 @@
 #include <vector>
 #include <boost/any.hpp>
 #include <xnet/base/noncopyable.h>
-#include <xnet/net/Channel.h>
 #include <xnet/base/Timestamp.h>
 #include <xnet/base/CurrentThread.h>
 #include <xnet/net/Timer.h>
 #include <xnet/net/TimerId.h>
+#include <xnet/net/Channel.h>
+#include <xnet/net/Callbacks.h>
 
 namespace xnet
 {
@@ -21,7 +22,7 @@ class Channel;
 class Poller;
 class TimerQueue;
 
-class EventLoop : boost::noncopyable
+class EventLoop : noncopyable
 {
 public:
     using Functor = std::function<void()>;
