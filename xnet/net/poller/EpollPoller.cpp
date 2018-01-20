@@ -134,7 +134,7 @@ void EpollPoller::update(int operation, Channel* channel)
     int fd = channel->fd();
 
     LOG_TRACE << "epoll_ctl operation = " << operationToString(operation)
-              << " fd = " << fd << " events = {" << channel->eventsToString() << "}"
+              << " fd = " << fd << " events = {" << channel->eventsToString() << "}";
 
     if(::epoll_ctl(epollfd_, operation, fd, &event) < 0)
     {
