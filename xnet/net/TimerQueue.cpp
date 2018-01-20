@@ -3,54 +3,10 @@
 //
 #include <sys/timerfd.h>
 #include <string.h>
+#include <xnet/base/Logging.h>
 #include <xnet/net/TimerQueue.h>
 
-namespace xnet
-{
-
-namespace detail
-{
-
-int createTimerfd()
-{
-    int timerFd = ::timerfd_create(CLOCK_MONOTONIC, TFD_NONBLOCK | TFD_CLOEXEC);
-    return timerFd;
-}
-
-struct timespec howMuchTimeFromNow(Timestamp when)
-{
-    int64_t microseconds = when.microsecondsSinceEpoch() - Timestamp::now().microsecondsSinceEpoch();
-    if(microseconds < 100) microseconds = 100;
-
-    struct timespec ts;
-    ts.tv_sec = static_cast<time_t>(microseconds / Timestamp::kMicrosecondsPerSecond);
-    ts.tv_nsec = static_cast<long>((microseconds % Timestamp::kMicrosecondsPerSecond) * 1000);
-
-    return ts;
-}
-
-void readTimerfd(int timerfd, Timestamp now)
-{
-    uint64_t howMany;
-    ::read(timerfd, &howMany, sizeof howMany);
-}
-
-void resetTimerfd(int timerfd, Timestamp expiration)
-{
-    struct itimerspec oldValue;
-    struct itimerspec newValue;
-    bzero(&oldValue, sizeof oldValue);
-    bzero(&newValue, sizeof newValue);
-    newValue.it_value = howMuchTimeFromNow(expiration);
-    timerfd_settime(timerfd, 0, &newValue, & oldValue);
-}
-
-}
-
-}
-
 using namespace xnet;
-using namespace xnet::detail;
 
 TimerQueue::TimerQueue(EventLoop *loop)
     : loop_(loop),
@@ -70,6 +26,57 @@ TimerQueue::~TimerQueue()
     ::close(timerfd_);
 }
 
+int TimerQueue::createTimerfd()
+{
+    int timerfd = ::timerfd_create(CLOCK_MONOTONIC, TFD_NONBLOCK | TFD_CLOEXEC);
+    if(timerfd < 0)
+    {
+        LOG_SYSFATAL << "Failed to create timerfd";
+    }
+
+    return timerfd;
+}
+
+void TimerQueue::readTimerfd() const
+{
+    uint64_t howMany;
+    ssize_t n = ::read(timerfd_, &howMany, sizeof(howMany));
+    if(n != sizeof(howMany))
+    {
+        LOG_ERROR << "TimerQueue::readTimerfd() reads " << n << " bytes instead of 8 bytes";
+    }
+}
+
+void TimerQueue::resetTimerfd(Timestamp expiration)
+{
+    struct itimerspec oldVal;
+    struct itimerspec newVal;
+    ::bzero(&oldVal, sizeof(oldVal));
+    ::bzero(&newVal, sizeof(newVal));
+
+    auto howMuchTimeFromNow = [](Timestamp expiration) ->timespec
+    {
+        int64_t microseconds = expiration.microsecondsSinceEpoch() - Timestamp::now().microsecondsSinceEpoch();
+        if(microseconds < 100)
+        {
+            microseconds = 100;
+        }
+
+        struct timespec ts;
+        ts.tv_sec = static_cast<time_t>(microseconds / Timestamp::kMicrosecondsPerSecond);
+        ts.tv_nsec = static_cast<long>((microseconds % Timestamp::kMicrosecondsPerSecond) * 1000);
+
+        return ts;
+    };
+
+    newVal.it_value = howMuchTimeFromNow(expiration);
+    int ret = ::timerfd_settime(timerfd_, 0, &newVal, &oldVal);
+    if(ret < 0)
+    {
+        LOG_SYSERR << "timerfd_settime()";
+    }
+}
+
 TimerId TimerQueue::addTimer(const TimerCallback& cb, Timestamp when, double interval)
 {
     TimerPtr timer = std::make_shared<Timer>(cb, when, interval);
@@ -84,32 +91,51 @@ TimerId TimerQueue::addTimer(TimerCallback&& cb, Timestamp when, double interval
     return TimerId(timer, timer->sequence());
 }
 
-void TimerQueue::cancel(TimerId timerId)
-{
-    loop_->runInLoop(std::bind(&TimerQueue::cancelInLoop, this, timerId));
-}
-
 void TimerQueue::addTimerInLoop(TimerPtr timer)
 {
     bool earliestChanged = insert(timer);
 
     if(earliestChanged)
     {
-        resetTimerfd(timerfd_, timer->expiration());
+        resetTimerfd(timer->expiration());
     }
 }
 
+bool TimerQueue::insert(TimerPtr timer)
+{
+    loop_->assertInLoopThread();
+
+    bool earliestChanged = false;
+    Timestamp when = timer->expiration();
+    auto it = timers_.begin();
+    if(it == timers_.end() || when < it->first)
+    {
+        earliestChanged = true;
+    }
+
+    timers_.insert(Entry(when, timer));
+    activeTimers_.insert(ActiveTimer(timer, timer->sequence()));
+
+    return earliestChanged;
+}
+
+void TimerQueue::cancel(TimerId timerId)
+{
+    loop_->runInLoop(std::bind(&TimerQueue::cancelInLoop, this, timerId));
+}
 
 void TimerQueue::cancelInLoop(TimerId timerId)
 {
+    loop_->assertInLoopThread();
+
     ActiveTimer timer(timerId.timer_, timerId.sequence_);
     auto it = activeTimers_.find(timer);
-    if(it != activeTimers_.end())
+    if(it != activeTimers_.end()) //定时器尚未到期取消定时器
     {
         timers_.erase(Entry(it->first->expiration(), it->first));
         activeTimers_.erase(timer);
     }
-    else if(callingExpiredTimers_)
+    else if(callingExpiredTimers_)  //定时器到期之后执行回调取消定时器
     {
         cancelingTimers_.insert(timer);
     }
@@ -117,8 +143,10 @@ void TimerQueue::cancelInLoop(TimerId timerId)
 
 void TimerQueue::handleRead()
 {
+    loop_->assertInLoopThread();
+
     Timestamp now(Timestamp::now());
-    readTimerfd(timerfd_, now);
+    readTimerfd();
 
     std::vector<Entry> expired = getExpired(now);
 
@@ -132,6 +160,7 @@ void TimerQueue::handleRead()
 
     callingExpiredTimers_ = false;
 
+    reset(expired, now);
 }
 
 std::vector<TimerQueue::Entry> TimerQueue::getExpired(Timestamp now)
@@ -156,7 +185,7 @@ void TimerQueue::reset(std::vector<Entry>& expired, Timestamp now)
 {
     Timestamp nextExpired;
 
-    for(auto entry : expired)
+    for(auto& entry : expired)
     {
         ActiveTimer timer(entry.second, entry.second->sequence());
 
@@ -179,22 +208,6 @@ void TimerQueue::reset(std::vector<Entry>& expired, Timestamp now)
 
     if(nextExpired.valid())
     {
-        resetTimerfd(timerfd_, nextExpired);
+        resetTimerfd(nextExpired);
     }
-}
-
-bool TimerQueue::insert(TimerPtr timer)
-{
-    bool earliestChanged = false;
-    Timestamp when = timer->expiration();
-    auto it = timers_.begin();
-    if(it == timers_.end() || when < it->first)
-    {
-        earliestChanged = true;
-    }
-
-    timers_.insert(Entry(when, timer));
-    activeTimers_.insert(ActiveTimer(timer, timer->sequence()));
-
-    return earliestChanged;
 }

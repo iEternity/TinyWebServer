@@ -7,7 +7,7 @@
 #include <atomic>
 #include <xnet/base/noncopyable.h>
 #include <xnet/base/Timestamp.h>
-#include <xnet/base/Callbacks.h>
+#include <xnet/net/Callbacks.h>
 
 namespace xnet
 {
