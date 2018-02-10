@@ -2,6 +2,7 @@
 // Created by zhangkuo on 17-8-6.
 //
 #include <sys/eventfd.h>
+#include <signal.h>
 #include <assert.h>
 #include <xnet/net/EventLoop.h>
 #include <xnet/net/SocketOps.h>
@@ -14,6 +15,7 @@ using namespace xnet;
 namespace
 {
     thread_local EventLoop* t_loopInThisThread = 0;
+    const int kPollTimeMs = 10000;
 
     int createEventFd()
     {
@@ -25,7 +27,20 @@ namespace
         return eventFd;
     }
 
-    const int kPollTimeMs = 10000;
+    /*
+     * 在linux上编写socket程序时，如果向一个一关闭的套接字发送消息时，第一次发送对端会回应RST报文，
+     * 第二次发送则系统会抛出SIGPIPE信号，默认该信号的处理方式是终止进程,这里直接忽略该信号
+     */
+    class IgnoreSigPipe
+    {
+    public:
+        IgnoreSigPipe()
+        {
+            ::signal(SIGPIPE, SIG_IGN);
+        }
+    };
+
+    IgnoreSigPipe initObj;
 }
 
 EventLoop::EventLoop()
@@ -42,7 +57,16 @@ EventLoop::EventLoop()
       currentActiveChannel_(NULL)
 
 {
-    t_loopInThisThread = this;
+    LOG_DEBUG << "EventLoop created " << this << " in thread " << threadId_;
+    if(t_loopInThisThread)
+    {
+        LOG_FATAL << "Another EventLoop " << t_loopInThisThread
+                  << " exists in this thread " << threadId_;
+    }
+    else
+    {
+        t_loopInThisThread = this;
+    }
 
     wakeupChannel_->setReadCallback(std::bind(&EventLoop::handleRead, this));
     wakeupChannel_->enableReading();
@@ -50,6 +74,9 @@ EventLoop::EventLoop()
 
 EventLoop::~EventLoop()
 {
+    LOG_DEBUG << "EventLoop " << this << " of thread " << threadId_
+              << " destructs in thread " << CurrentThread::tid();
+
     wakeupChannel_->disableAll();
     wakeupChannel_->remove();
     ::close(wakeupFd_);
